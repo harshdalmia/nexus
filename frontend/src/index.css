@@ -1,0 +1,264 @@
+@import 'tailwindcss';
+@import '@xyflow/react/dist/base.css';
+
+/* ============================================================================
+   SENTINEL — visual design system v2
+   ----------------------------------------------------------------------------
+   A financial-intelligence instrument, not a dashboard template.
+
+   Principles
+   1. Surfaces are layered (six steps), never one flat grey.
+   2. Typography carries importance before colour does.
+   3. Colour is a five-band risk scale plus two functional hues. Nothing else.
+   4. Structure comes from hairlines, recesses and rules — not from boxes
+      inside boxes.
+   5. Motion is short, eased and only used to preserve object identity.
+   ============================================================================ */
+
+@theme inline {
+  --font-sans: 'Inter Tight', 'Inter', ui-sans-serif, system-ui, sans-serif;
+  --font-display: 'Instrument Sans', 'Inter Tight', ui-sans-serif, sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* ---- surfaces ---- */
+  --color-abyss: var(--s-abyss);
+  --color-canvas: var(--s-canvas);
+  --color-sunken: var(--s-sunken);
+  --color-panel: var(--s-panel);
+  --color-raise: var(--s-raise);
+  --color-sel: var(--s-sel);
+  --color-line: var(--s-line);
+  --color-rule: var(--s-rule);
+  --color-edge: var(--s-edge);
+
+  /* ---- text ---- */
+  --color-ink: var(--t-ink);
+  --color-dim: var(--t-dim);
+  --color-muted: var(--t-muted);
+  --color-faint: var(--t-faint);
+  --color-ghost: var(--t-ghost);
+
+  /* ---- risk scale: critical → safe ---- */
+  --color-crit: var(--r-crit);
+  --color-crit-bg: var(--r-crit-bg);
+  --color-crit-line: var(--r-crit-line);
+  --color-sev: var(--r-high);
+  --color-sev-bg: var(--r-high-bg);
+  --color-sev-line: var(--r-high-line);
+  --color-rev: var(--r-med);
+  --color-rev-bg: var(--r-med-bg);
+  --color-rev-line: var(--r-med-line);
+  --color-ok: var(--r-safe);
+  --color-ok-bg: var(--r-safe-bg);
+  --color-ok-line: var(--r-safe-line);
+
+  /* ---- functional hues ---- */
+  --color-info: var(--f-info);
+  --color-info-bg: var(--f-info-bg);
+  --color-info-line: var(--f-info-line);
+  --color-model: var(--f-ai);
+  --color-model-bg: var(--f-ai-bg);
+  --color-model-line: var(--f-ai-line);
+  --color-slate: var(--f-slate);
+  --color-slate-bg: var(--f-slate-bg);
+
+  /* ---- radii: tight, machined ---- */
+  --radius-xs: 1px;
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+
+  /* ------------------------------------------------------------------
+     Type scale — rebuilt for an 8-hour reading day on a 27" display.
+
+     Seven text roles and four metric roles. Nothing in the product is
+     smaller than 13px, and the jumps between adjacent roles are large
+     enough (13 → 15 → 19 → 24 → 34) to establish hierarchy without
+     relying on weight or colour.
+     ------------------------------------------------------------------ */
+
+  /* secondary metadata, timestamps, ticks, provenance */
+  --text-meta: 0.8125rem; /* 13 */
+  --text-meta--line-height: 1.25rem;
+  /* labels, eyebrows, chips, keycaps */
+  --text-label: 0.875rem; /* 14 */
+  --text-label--line-height: 1.375rem;
+  /* table content, navigation, controls, dense body */
+  --text-body: 0.9375rem; /* 15 */
+  --text-body--line-height: 1.5rem;
+  /* emphasised body, entity ids, values in tables */
+  --text-body-lg: 1rem; /* 16 */
+  --text-body-lg--line-height: 1.625rem;
+  /* narrative prose — AI explanations, SAR paragraphs */
+  --text-read: 1.0625rem; /* 17 */
+  --text-read--line-height: 1.8125rem;
+  /* card and panel titles */
+  --text-card: 1.1875rem; /* 19 */
+  --text-card--line-height: 1.625rem;
+  /* section titles */
+  --text-section: 1.5rem; /* 24 */
+  --text-section--line-height: 1.875rem;
+  /* page / workspace titles */
+  --text-page: 2.125rem; /* 34 */
+  --text-page--line-height: 2.375rem;
+
+  /* metric roles, smallest → largest */
+  --text-metric: 2rem; /* 32 — inline metrics, KPI chips */
+  --text-metric--line-height: 2.125rem;
+  --text-metric-lg: 2.75rem; /* 44 — panel metrics */
+  --text-metric-lg--line-height: 2.75rem;
+  --text-hero: 3.5rem; /* 56 — risk score, headline metric */
+  --text-hero--line-height: 3.375rem;
+  --text-display: 4rem; /* 64 — execution stage, single decisive number */
+  --text-display--line-height: 3.875rem;
+
+  /* legacy aliases kept so no component keeps a hardcoded size; every one
+     now resolves into the roles above */
+  --text-2xs: var(--text-meta);
+  --text-2xs--line-height: 1.25rem;
+  --text-xs2: var(--text-label);
+  --text-xs2--line-height: 1.375rem;
+  --text-dense: var(--text-body);
+  --text-dense--line-height: 1.5rem;
+  --text-lede: var(--text-read);
+  --text-lede--line-height: 1.8125rem;
+  --text-title: var(--text-section);
+  --text-title--line-height: 1.875rem;
+
+  --ease-out-quint: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* ---------------------------------------------------------------- dark ---- */
+.theme-dark {
+  --s-abyss: #04060a;
+  --s-canvas: #070a10;
+  --s-sunken: #0a0e15;
+  --s-panel: #0d121a;
+  --s-raise: #121824;
+  --s-sel: #18202e;
+  --s-line: #171e29;
+  --s-rule: #1f2836;
+  --s-edge: #2c3746;
+
+  --t-ink: #e8edf6;
+  --t-dim: #b7c1d1;
+  --t-muted: #8a95a7;
+  --t-faint: #5d6879;
+  --t-ghost: #3a4453;
+
+  /* critical — deep crimson */
+  --r-crit: #ff5d70;
+  --r-crit-bg: #2b0912;
+  --r-crit-line: #86152f;
+  /* high — red */
+  --r-high: #f2545b;
+  --r-high-bg: #260c11;
+  --r-high-line: #762129;
+  /* medium — amber */
+  --r-med: #e5a33a;
+  --r-med-bg: #241a08;
+  --r-med-line: #6d4a11;
+  /* safe — emerald */
+  --r-safe: #35c48b;
+  --r-safe-bg: #06211a;
+  --r-safe-line: #12583f;
+
+  /* information / interactive — slate-blue electric */
+  --f-info: #5b93f5;
+  --f-info-bg: #0c1729;
+  --f-info-line: #234a86;
+  /* AI / model — royal violet */
+  --f-ai: #a98bff;
+  --f-ai-bg: #150f2c;
+  --f-ai-line: #453389;
+  /* neutral chrome accent */
+  --f-slate: #7d90ab;
+  --f-slate-bg: #101722;
+
+  --elev-1: 0 1px 0 0 color-mix(in oklab, #ffffff 5%, transparent) inset;
+  --elev-2:
+    0 1px 0 0 color-mix(in oklab, #ffffff 4%, transparent) inset,
+    0 2px 6px -2px rgb(0 0 0 / 0.55);
+  --elev-3:
+    0 1px 0 0 color-mix(in oklab, #ffffff 6%, transparent) inset,
+    0 1px 2px 0 rgb(0 0 0 / 0.4),
+    0 22px 60px -18px rgb(0 0 0 / 0.8);
+
+  color-scheme: dark;
+}
+
+/* --------------------------------------------------------------- light ---- */
+.theme-light {
+  --s-abyss: #dfe3ea;
+  --s-canvas: #e7eaf0;
+  --s-sunken: #eef1f5;
+  --s-panel: #ffffff;
+  --s-raise: #f3f5f9;
+  --s-sel: #e5ecf9;
+  --s-line: #e0e4ec;
+  --s-rule: #d5dae4;
+  --s-edge: #b9c1cf;
+
+  --t-ink: #080b11;
+  --t-dim: #333c4b;
+  --t-muted: #4d5666;
+  --t-faint: #737e8f;
+  --t-ghost: #9ba4b3;
+
+  --r-crit: #b0102c;
+  --r-crit-bg: #fde8eb;
+  --r-crit-line: #e8adb7;
+  --r-high: #bf2029;
+  --r-high-bg: #fce9ea;
+  --r-high-line: #ecb0b4;
+  --r-med: #8a5205;
+  --r-med-bg: #fbf1da;
+  --r-med-line: #e2c68c;
+  --r-safe: #07714a;
+  --r-safe-bg: #e1f4ec;
+  --r-safe-line: #9dd4bb;
+
+  --f-info: #1a4ccb;
+  --f-info-bg: #e5ebfc;
+  --f-info-line: #aec0f2;
+  --f-ai: #5b2fc9;
+  --f-ai-bg: #ece7fb;
+  --f-ai-line: #c2aaf0;
+  --f-slate: #55637a;
+  --f-slate-bg: #eef1f6;
+
+  --elev-1: 0 1px 0 0 color-mix(in oklab, #ffffff 80%, transparent) inset;
+  --elev-2:
+    0 1px 0 0 color-mix(in oklab, #ffffff 70%, transparent) inset,
+    0 1px 3px -1px rgb(16 24 40 / 0.12);
+  --elev-3:
+    0 1px 0 0 color-mix(in oklab, #ffffff 70%, transparent) inset,
+    0 2px 4px -2px rgb(16 24 40 / 0.14),
+    0 18px 48px -16px rgb(16 24 40 / 0.24);
+
+  color-scheme: light;
+}
+
+/* ------------------------------------------------------------- density ----
+   Both modes are now comfortable. "Compact" is the working default at 44px
+   rows; "relaxed" is for long review sessions and projection. Density trades
+   rows-on-screen, never legibility. */
+[data-density='compact'] {
+  --row-h: 44px;
+  --cell-x: 0.875rem;
+  --pad-y: 0.5rem;
+  --panel-head-h: 48px;
+  --panel-x: 1rem;
+  --control-h: 32px;
+}
+
+[data-density='relaxed'] {
+  --row-h: 52px;
+  --cell-x: 1.125rem;
+  --pad-y: 0.75rem;
+  --panel-head-h: 56px;
+  --panel-x: 1.25rem;
+  --control-h: 36px;
+}
+
