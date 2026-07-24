@@ -262,3 +262,64 @@
   --control-h: 36px;
 }
 
+@layer base {
+  * {
+    border-color: var(--s-line);
+    min-width: 0;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    margin: 0;
+    background: var(--s-canvas);
+    color: var(--t-ink);
+    font-family: var(--font-sans);
+    /* 15px base: table content and body text read at the same size */
+    font-size: var(--text-body);
+    line-height: 1.5rem;
+    font-optical-sizing: auto;
+    font-feature-settings: 'ss01' 1, 'cv05' 1, 'calt' 1;
+    letter-spacing: -0.006em;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    overflow: hidden;
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--f-info) 26%, transparent);
+    color: var(--t-ink);
+  }
+
+  :focus-visible {
+    outline: 1.5px solid var(--f-info);
+    outline-offset: 1px;
+    border-radius: 2px;
+  }
+
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+    color: inherit;
+    letter-spacing: inherit;
+  }
+
+  code,
+  kbd {
+    font-family: var(--font-mono);
+    font-feature-settings: 'zero' 1;
+  }
+
+  /* lucide draws at stroke-width 2 by default, which reads chunky at 12–14px.
+     CSS beats the presentation attribute, so every icon thins out at once. */
+  .lucide {
+    stroke-width: 1.6px;
+  }
+}
+
