@@ -323,3 +323,410 @@
   }
 }
 
+@layer components {
+  /* ============================ surfaces ============================ */
+  .panel {
+    background: var(--s-panel);
+    border: 1px solid var(--s-line);
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  /* panel headers are recessed and carry a hairline accent on the left:
+     the repeated motif that makes the product recognisable */
+  .panel-head {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    height: var(--panel-head-h);
+    padding: 0 var(--panel-x);
+    border-bottom: 1px solid var(--s-rule);
+    background:
+      linear-gradient(180deg, color-mix(in oklab, var(--t-ink) 3%, var(--s-sunken)), var(--s-sunken));
+    box-shadow: var(--elev-1);
+    flex: none;
+  }
+
+  .panel-head::after {
+    content: '';
+    position: absolute;
+    inset-inline: 0;
+    bottom: -1px;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      color-mix(in oklab, var(--f-info) 55%, transparent),
+      transparent 22%
+    );
+  }
+
+  .sheen {
+    box-shadow: var(--elev-2);
+  }
+
+  .overlay-shadow {
+    box-shadow: var(--elev-3);
+  }
+
+  /* ============================ typography ============================ */
+  /* panel and section titles: 14px, semibold, modest tracking. Big enough to
+     read as a title, small enough to stay out of the data's way. */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-sans);
+    font-size: var(--text-label);
+    line-height: 1.375rem;
+    font-weight: 600;
+    letter-spacing: 0.055em;
+    text-transform: uppercase;
+    color: var(--t-dim);
+  }
+
+  /* inside a panel header the eyebrow becomes a real card title: 17px,
+     sentence case, ink. Uppercase micro-labels stay for grouping inside
+     panel bodies, where they are not competing with data. */
+  .panel-head > .eyebrow {
+    font-family: var(--font-display);
+    font-size: var(--text-read);
+    line-height: 1.5rem;
+    font-weight: 600;
+    letter-spacing: -0.012em;
+    text-transform: none;
+    color: var(--t-ink);
+  }
+
+  /* a 3px tick before section titles inside panel headers */
+  .panel-head > .eyebrow::before {
+    content: '';
+    width: 3px;
+    height: 0.875rem;
+    background: color-mix(in oklab, var(--f-info) 78%, transparent);
+  }
+
+  .num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'zero' 1;
+    letter-spacing: -0.02em;
+  }
+
+  /* headline numerics: display face, tight, tabular, slightly optically raised */
+  .metric {
+    font-family: var(--font-display);
+    font-variant-numeric: tabular-nums lining-nums;
+    font-weight: 600;
+    letter-spacing: -0.042em;
+    font-feature-settings: 'ss01' 1;
+  }
+
+  .display {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: -0.035em;
+  }
+
+  /* case ids, rule ids, entity ids — institutional, slightly wider */
+  .ident {
+    font-family: var(--font-mono);
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ============================ data rows ============================ */
+  .drow {
+    height: var(--row-h);
+    border-bottom: 1px solid color-mix(in oklab, var(--s-line) 62%, transparent);
+    transition:
+      background 150ms var(--ease-out-quint),
+      box-shadow 150ms var(--ease-out-quint);
+  }
+
+  .drow:hover {
+    background: color-mix(in oklab, var(--s-raise) 78%, var(--f-info) 5%);
+    box-shadow: inset 1px 0 0 color-mix(in oklab, var(--f-info) 45%, transparent);
+  }
+
+  .drow[data-active='true'] {
+    background: var(--s-sel);
+    box-shadow: inset 2px 0 0 var(--f-info);
+  }
+
+  /* table cells: generous horizontal padding, driven by density */
+  .dcell {
+    padding-inline: var(--cell-x);
+  }
+
+  /* sticky table headers sit in a recess with a hard rule beneath */
+  .thead {
+    background: var(--s-sunken);
+    box-shadow:
+      inset 0 -1px 0 0 var(--s-rule),
+      var(--elev-1);
+  }
+
+  /* ============================ controls ============================ */
+  .ctl {
+    --ctl-bg: linear-gradient(180deg, var(--s-raise), color-mix(in oklab, var(--s-raise) 82%, var(--s-panel)));
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: var(--control-h);
+    padding: 0 0.75rem;
+    border: 1px solid var(--s-rule);
+    border-radius: 2px;
+    background: var(--ctl-bg);
+    box-shadow: var(--elev-1);
+    color: var(--t-dim);
+    font-size: var(--text-label);
+    font-weight: 500;
+    white-space: nowrap;
+    transition:
+      border-color 130ms var(--ease-out-quint),
+      color 130ms var(--ease-out-quint),
+      background 130ms var(--ease-out-quint),
+      transform 90ms var(--ease-out-quint);
+  }
+
+  .ctl:hover:not(:disabled) {
+    border-color: var(--s-edge);
+    color: var(--t-ink);
+  }
+
+  .ctl:active:not(:disabled) {
+    transform: translateY(0.5px);
+    box-shadow: none;
+  }
+
+  .ctl:disabled {
+    opacity: 0.42;
+    cursor: not-allowed;
+  }
+
+  .ctl-primary {
+    border-color: color-mix(in oklab, var(--f-info) 55%, var(--s-rule));
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--f-info) 26%, var(--s-raise)),
+      color-mix(in oklab, var(--f-info) 14%, var(--s-raise))
+    );
+    color: color-mix(in oklab, var(--f-info) 55%, var(--t-ink));
+  }
+
+  .ctl-primary:hover:not(:disabled) {
+    border-color: var(--f-info);
+    color: var(--t-ink);
+  }
+
+  .ctl-danger {
+    border-color: color-mix(in oklab, var(--r-high) 45%, var(--s-rule));
+    background: linear-gradient(180deg, var(--r-high-bg), color-mix(in oklab, var(--r-high-bg) 70%, var(--s-panel)));
+    color: var(--r-high);
+  }
+
+  .ctl-ghost {
+    border-color: transparent;
+    background: transparent;
+    box-shadow: none;
+    color: var(--t-muted);
+  }
+
+  .ctl-ghost:hover:not(:disabled) {
+    border-color: var(--s-rule);
+    background: var(--s-raise);
+    color: var(--t-ink);
+  }
+
+  /* inputs: recessed wells, not floating boxes */
+  .field {
+    height: var(--control-h);
+    padding: 0 0.75rem;
+    font-size: var(--text-body);
+    border: 1px solid var(--s-rule);
+    border-radius: 2px;
+    background: var(--s-sunken);
+    box-shadow: inset 0 1px 2px 0 rgb(0 0 0 / 0.28);
+    color: var(--t-ink);
+    transition:
+      border-color 130ms var(--ease-out-quint),
+      box-shadow 130ms var(--ease-out-quint);
+  }
+
+  .field::placeholder {
+    color: var(--t-ghost);
+  }
+
+  .field:focus {
+    border-color: color-mix(in oklab, var(--f-info) 65%, var(--s-edge));
+    box-shadow:
+      inset 0 1px 2px 0 rgb(0 0 0 / 0.28),
+      0 0 0 2px color-mix(in oklab, var(--f-info) 18%, transparent);
+    outline: none;
+  }
+
+  /* the query bar: a wide well with a left accent gutter */
+  .field-hero {
+    background: var(--s-sunken);
+    box-shadow: inset 0 1px 3px 0 rgb(0 0 0 / 0.32);
+  }
+
+  /* ============================ badges ============================ */
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3125rem;
+    height: 1.375rem;
+    padding: 0 0.4375rem;
+    border: 1px solid;
+    border-radius: 2px;
+    font-family: var(--font-sans);
+    font-size: 0.75rem; /* 12 — the one deliberate exception, all-caps */
+    line-height: 1;
+    font-weight: 650;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  /* risk chips carry a solid left cap: legible in greyscale and at a glance */
+  .badge-cap {
+    position: relative;
+    padding-left: 0.5625rem;
+  }
+
+  .badge-cap::before {
+    content: '';
+    position: absolute;
+    inset-block: 1.5px;
+    left: 1.5px;
+    width: 2.5px;
+    background: currentColor;
+    opacity: 0.85;
+  }
+
+  /* ============================ scrollbars ============================ */
+  .scroll {
+    overflow: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--s-edge) transparent;
+  }
+
+  .scroll::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+  }
+
+  .scroll::-webkit-scrollbar-thumb {
+    background: var(--s-edge);
+    border-radius: 999px;
+    border: 3px solid transparent;
+    background-clip: content-box;
+  }
+
+  .scroll:hover::-webkit-scrollbar-thumb {
+    background: color-mix(in oklab, var(--s-edge) 60%, var(--t-muted));
+    background-clip: content-box;
+  }
+
+  .scroll::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* ============================ seams ============================ */
+  .hair-r {
+    border-right: 1px solid var(--s-line);
+  }
+
+  .hair-l {
+    border-left: 1px solid var(--s-line);
+  }
+
+  .hair-t {
+    border-top: 1px solid var(--s-line);
+  }
+
+  .hair-b {
+    border-bottom: 1px solid var(--s-line);
+  }
+
+  /* engineering grid, used behind the execution stage */
+  .blueprint {
+    background-image:
+      linear-gradient(color-mix(in oklab, var(--s-rule) 60%, transparent) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in oklab, var(--s-rule) 60%, transparent) 1px, transparent 1px);
+    background-size: 48px 48px;
+    background-position: center;
+  }
+
+  /* chart plot area: recessed well with a hairline frame */
+  .plot {
+    position: relative;
+    background:
+      linear-gradient(180deg, color-mix(in oklab, var(--t-ink) 1.5%, transparent), transparent 60%),
+      var(--s-sunken);
+    border: 1px solid color-mix(in oklab, var(--s-line) 80%, transparent);
+    border-radius: 2px;
+  }
+
+  .tick-label {
+    font-family: var(--font-mono);
+    font-size: 0.75rem; /* 12 — axis ticks, the smallest thing on screen */
+    line-height: 1rem;
+    letter-spacing: 0.005em;
+    color: var(--t-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* floating control cluster over a canvas */
+  .canvas-chrome {
+    background: color-mix(in oklab, var(--s-panel) 92%, transparent);
+    border: 1px solid var(--s-rule);
+    border-radius: 3px;
+    box-shadow: var(--elev-2);
+    backdrop-filter: blur(8px);
+  }
+
+  .scrub {
+    appearance: none;
+    width: 100%;
+    height: 14px;
+    background: transparent;
+    cursor: ew-resize;
+  }
+
+  .scrub::-webkit-slider-runnable-track {
+    height: 2px;
+    background: var(--s-edge);
+    border-radius: 2px;
+  }
+
+  .scrub::-webkit-slider-thumb {
+    appearance: none;
+    width: 9px;
+    height: 15px;
+    margin-top: -6.5px;
+    border-radius: 1px;
+    background: linear-gradient(180deg, color-mix(in oklab, var(--f-info) 80%, white 20%), var(--f-info));
+    border: 1px solid color-mix(in oklab, var(--f-info) 50%, black);
+  }
+
+  .scrub::-moz-range-track {
+    height: 2px;
+    background: var(--s-edge);
+  }
+
+  .scrub::-moz-range-thumb {
+    width: 9px;
+    height: 15px;
+    border-radius: 1px;
+    background: var(--f-info);
+    border: none;
+  }
+}
+
