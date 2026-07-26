@@ -730,3 +730,87 @@
   }
 }
 
+/* ============================================================================
+   react flow — the entity graph inherits the same design language
+   ============================================================================ */
+.react-flow {
+  --xy-background-color: var(--s-canvas);
+  --xy-edge-stroke-default: var(--s-edge);
+  --xy-edge-stroke-width-default: 1.2;
+  --xy-handle-background-color-default: var(--s-edge);
+  --xy-handle-border-color-default: transparent;
+  --xy-selection-background-color: color-mix(in oklab, var(--f-info) 12%, transparent);
+  background: var(--s-canvas);
+}
+
+.react-flow__attribution {
+  display: none;
+}
+
+.react-flow__handle {
+  width: 5px;
+  height: 5px;
+  border: none;
+  opacity: 0;
+}
+
+.react-flow__edge-path {
+  transition: stroke 160ms var(--ease-out-quint), opacity 160ms var(--ease-out-quint);
+}
+
+.react-flow__edge-text {
+  font-family: var(--font-mono);
+  font-size: 8.5px;
+  fill: var(--t-muted);
+}
+
+.react-flow__edge-textbg {
+  fill: var(--s-panel);
+}
+
+.react-flow__controls {
+  box-shadow: var(--elev-2);
+  border: 1px solid var(--s-rule);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.react-flow__controls-button {
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-bottom: 1px solid var(--s-line);
+  background: var(--s-panel);
+  color: var(--t-muted);
+  transition: background 130ms var(--ease-out-quint), color 130ms var(--ease-out-quint);
+}
+
+.react-flow__controls-button:hover {
+  background: var(--s-raise);
+  color: var(--t-ink);
+}
+
+.react-flow__controls-button svg {
+  fill: currentColor;
+  max-width: 10px;
+  max-height: 10px;
+}
+
+.react-flow__minimap {
+  background: color-mix(in oklab, var(--s-sunken) 92%, transparent) !important;
+  border: 1px solid var(--s-rule);
+  border-radius: 3px;
+  box-shadow: var(--elev-2);
+}
+
+.react-flow__minimap-mask {
+  fill: color-mix(in oklab, var(--s-abyss) 62%, transparent);
+  stroke: color-mix(in oklab, var(--f-info) 50%, transparent);
+  stroke-width: 2;
+}
+
+.react-flow__node {
+  font-family: var(--font-sans);
+  cursor: pointer;
+}
+
