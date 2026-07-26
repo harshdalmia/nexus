@@ -1,0 +1,6 @@
+-r requirements.txt
+
+# Test-only dependencies. `httpx` is what starlette's TestClient runs on, so the API
+# tests cannot import without it.
+pytest==8.3.4
+httpx==0.28.1
