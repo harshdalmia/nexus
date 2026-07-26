@@ -1,0 +1,18 @@
+# Drop the AMLworld files here. The data itself is git-ignored (data/raw/*.csv,
+# data/raw/*.txt) because HI-Small alone is ~500 MB; this placeholder only keeps
+# the directory in the tree so a fresh clone has somewhere to put it.
+#
+# Expected layout — see the root README, sections "Setup" and "Data sources":
+#
+#   data/raw/
+#   ├── HI-Small_Trans.csv        development + demo (5,078,345 rows)
+#   ├── HI-Small_Patterns.txt     held-out ground truth, evaluation only
+#   ├── HI-Small_accounts.csv     account -> entity map
+#   ├── LI-Small_Trans.csv        false-positive evaluation (optional)
+#   ├── LI-Small_Patterns.txt
+#   └── LI-Small_accounts.csv
+#
+# Note the AMLworld naming quirk: Trans.csv and Patterns.txt are capitalised,
+# accounts.csv is lowercase. Verify a load with:
+#
+#   cd backend && .venv/bin/python -m nexus.ingest --variant HI-Small
