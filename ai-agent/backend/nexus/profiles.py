@@ -2,6 +2,10 @@
 
 One row per node (bank|account) with in/out volume, counts, degree, activity span and
 velocity. Feeds peer clustering and the evidence tools.
+
+Row order is sorted by node id and therefore deterministic: the peer clustering downstream
+(MiniBatchKMeans) is order-sensitive, so an unstable order would move risk scores between
+rebuilds. See `build_profiles`.
 """
 
 from __future__ import annotations
@@ -59,4 +63,10 @@ def build_profiles(con: duckdb.DuckDBPyConnection) -> pd.DataFrame:
     df["io_ratio"] = df["in_sum"] / (df["out_sum"] + 1.0)
 
     df = df.drop(columns=["out_min", "out_max", "in_min", "in_max"])
-    return df.set_index("node")
+    # Deterministic row order. The SQL is a FULL OUTER JOIN with no ORDER BY, so DuckDB's
+    # multi-threaded output order varies between calls. That order reaches
+    # MiniBatchKMeans in peers.PeerModel, which is order-sensitive even with a fixed
+    # random_state, so unstable order => shifting clusters => shifting peer_deviation z
+    # => shifting risk between rebuilds. Sorting by the unique node id is a total, stable
+    # order and fixes the clustering input for every caller.
+    return df.set_index("node").sort_index()
