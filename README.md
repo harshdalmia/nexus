@@ -255,6 +255,31 @@ Each layer is independently validatable — what regulators ask for. The LLM liv
 
 Language → structure → questions → evidence → verdict → *fact-checked* language.
 
+### Runtime pipeline
+
+The same flow as the code executes it. Note the two shapes that matter: the **fan-out**, where
+the planner picks only the tools that can separate the live hypotheses, and the **validator
+loop**, where a narrative that cites anything untraceable is sent back rather than published.
+
+![NEXUS-AML runtime pipeline: a query is parsed into a plan, candidate accounts are screened, the investigation fans out to the six detection tools (benign signals, peer comparison, near threshold, rapid pass-through, isolation forest, graph motif), their evidence lands in the ledger, then the hypothesis duel, risk score and narration run in sequence, with the claim validator looping a failed narrative back to be rewritten before findings are published.](assets/architecture-pipeline.png)
+
+Stage by stage, and where each one lives:
+
+| Stage | Module | What it settles |
+|---|---|---|
+| Parse + plan | `intent.py`, `planner.py`, `scope.py` | Intent, filters, entities, typology → which tools run and which are declined, with reasons |
+| Screen accounts | `screener.py` | For a broad query, which candidates are worth a full investigation (500 screened, 25 investigated) |
+| Investigate | `orchestrator.py` | Dispatches the selected tools against the scoped slice, with per-tool telemetry |
+| Detection tools | `tools/*` | Each emits typed `EvidenceRecord`s pointing at real transaction IDs. `isolation_forest` is neutral by design |
+| Evidence ledger | `ledger.py` | The case file: every finding with its calculation, value, direction, strength and proof |
+| Hypothesis duel | `duel.py`, `hypotheses/library.yaml` | *Which* story is true — suspicious or benign |
+| Risk score | `risk.py`, `families.py` | *How severe* the winning suspicious story is, as a transparent additive sum |
+| Narrate → Validate | `narrator.py`, `validator.py` | Prose from the ledger, then every number and transaction checked against it; failures fall back to the deterministic template |
+| Findings | `findings.py`, `casebuilder.py` | Ranked results with risk tier, explanation and escalation |
+
+The loop between `Narrate` and `Validate` is the reason the LLM cannot inject an unsupported
+number: an unverifiable claim never reaches `Findings`.
+
 ### Hypotheses as fingerprints
 
 A hypothesis declares, per evidence family, an **expected direction** (high/low) and an **importance weight**. Families it does not list are neutral. The library (`hypotheses/library.yaml`) is keyed by typology.
@@ -602,7 +627,8 @@ Hardening: CORS for browser clients, background warmup with readiness reporting,
 
 ```text
 hack/
-├── README.md                    # this file — the only README
+├── README.md                    # this file
+├── assets/                      # diagrams referenced from this README
 ├── ai-agent/
 │   ├── backend/
 │   │   ├── nexus/                       # importable package
