@@ -176,7 +176,7 @@ export const PlanRail = () => {
   const { activeCaseId } = useWorkspaceState();
 
   return (
-    <Panel className="hair-r w-full border-0 lg:w-[19.5rem]">
+    <Panel collapseId="ask.plan" className="hair-r w-full border-0 lg:w-[20.5rem] 2xl:w-[24rem]">
       <PanelHead
         title="execution plan"
         meta={
@@ -202,14 +202,14 @@ export const PlanRail = () => {
 
       {scenario === null ? (
         <>
-          <div className="hair-b px-4 py-3">
-            <p className="eyebrow pb-1">available roster</p>
+          <div className="hair-b px-6 py-4.5">
+            <p className="eyebrow pb-2">available roster</p>
             <p className="text-label leading-relaxed text-muted">
               Fourteen nodes are wired. The planner decides which of them earn their cost for your
               question — and the ones it declines stay on screen, greyed, with the reason attached.
             </p>
           </div>
-          <ol className="scroll min-h-0 flex-1 px-4 py-3">
+          <ol className="scroll min-h-0 flex-1 px-6 py-4.5">
             {roster.map((tool, index) => (
               <li key={tool.tool} className="relative flex items-center gap-2 py-1 pl-6">
                 {index < roster.length - 1 && (
@@ -223,7 +223,7 @@ export const PlanRail = () => {
               </li>
             ))}
           </ol>
-          <div className="hair-t px-4 py-3">
+          <div className="hair-t px-6 py-4.5">
             <button
               type="button"
               onClick={() => requestQuery('Find structuring patterns in the last 30 days')}
@@ -238,8 +238,8 @@ export const PlanRail = () => {
         </>
       ) : (
         <>
-          <div className="hair-b bg-raise/50 px-4 py-3">
-            <p className="eyebrow pb-1">extracted intent</p>
+          <div className="hair-b bg-raise/50 px-6 py-4.5">
+            <p className="eyebrow pb-2">extracted intent</p>
             {stepStates[0] === 'running' ? (
               <div className="flex flex-col gap-1.5 pt-0.5">
                 <Skeleton width="78%" />
@@ -259,12 +259,12 @@ export const PlanRail = () => {
             )}
           </div>
 
-          <div className="hair-b bg-model-bg/30 px-4 py-3">
+          <div className="hair-b bg-model-bg/30 px-6 py-4.5">
             <p className="eyebrow pb-1 text-model">planner rationale</p>
             <p className="text-meta leading-relaxed text-muted">{scenario.plannerNote}</p>
           </div>
 
-          <ol className="scroll min-h-0 flex-1 px-4 py-3" aria-live="polite">
+          <ol className="scroll min-h-0 flex-1 px-6 py-4.5" aria-live="polite">
             {scenario.steps.map((step, index) => (
               <StepNode
                 key={step.tool}

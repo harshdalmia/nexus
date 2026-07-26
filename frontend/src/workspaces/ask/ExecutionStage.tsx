@@ -1,6 +1,9 @@
 import { Activity, ChevronsDownUp, Cpu, Gauge, Layers, Rewind, Zap } from 'lucide-react';
+import { useEffect } from 'react';
+import { Minimize2 } from 'lucide-react';
 import { Segmented } from '@/components/primitives/Chip';
-import { Button } from '@/components/primitives/Button';
+import { Kbd } from '@/components/primitives/Button';
+import { useWorkspaceState } from '@/store/workspaceStore';
 import { detailFor } from '@/data/agentDetail';
 import { stageOrder, stageTitle } from '@/data/scenarios';
 import { seconds } from '@/lib/format';
@@ -51,6 +54,37 @@ export const ExecutionStage = () => {
     startedAt,
     origin,
   } = useAgent();
+  const { paletteOpen, shortcutsOpen } = useWorkspaceState();
+
+  /* Escape leaves full canvas. The stage covers the workspace, so without this
+     the only way out was one small button — the analyst could reasonably feel
+     stuck. Overlays own Escape first: if the palette or the shortcut sheet is
+     open, that layer closes and the stage stays. */
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape' || paletteOpen || shortcutsOpen) {
+        return;
+      }
+
+      const target = event.target;
+
+      /* never steal Escape from a field the analyst is typing in */
+      if (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      collapseStage();
+    };
+
+    window.addEventListener('keydown', onKey);
+
+    return () => window.removeEventListener('keydown', onKey);
+  }, [collapseStage, paletteOpen, shortcutsOpen]);
 
   if (scenario === null) {
     return null;
@@ -82,11 +116,11 @@ export const ExecutionStage = () => {
 
   return (
     <section
-      className="hair-b anim-fade flex min-h-0 flex-1 flex-col bg-sunken"
+      className="hair-b anim-canvas-in flex min-h-0 flex-1 flex-col bg-sunken"
       aria-label="Investigation execution"
     >
       {/* ---------- header ---------- */}
-      <header className="blueprint hair-b relative overflow-hidden px-6 py-5">
+      <header className="blueprint hair-b relative overflow-hidden px-8 py-7">
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent to-sunken" />
         <div className="relative flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
@@ -101,7 +135,7 @@ export const ExecutionStage = () => {
               {!isDone && <span className="anim-caret text-info">…</span>}
             </h2>
             <div className="pt-2">
-              <p className="eyebrow pb-0.5">investigation query</p>
+              <p className="eyebrow pb-1.5">investigation query</p>
               <p className="max-w-[68ch] border-l-2 border-info pl-2.5 text-lede text-ink">“{query}”</p>
             </div>
 
@@ -144,17 +178,22 @@ export const ExecutionStage = () => {
                   { id: '4', label: '4×' },
                 ]}
               />
-              {isDone ? (
-                <Button size="xs" variant="primary" onClick={collapseStage}>
-                  <ChevronsDownUp className="size-3" aria-hidden="true" />
-                  open dossier
-                </Button>
-              ) : (
-                <Button size="xs" variant="ghost" onClick={collapseStage}>
-                  <ChevronsDownUp className="size-3" aria-hidden="true" />
-                  minimise
-                </Button>
-              )}
+              {/* The way out of full canvas, stated plainly and present in both
+                  states — mid-run and finished. */}
+              <button
+                type="button"
+                onClick={collapseStage}
+                className={`ctl gap-2 ${isDone ? 'ctl-primary' : ''}`}
+                aria-label={isDone ? 'Exit full canvas and open the dossier' : 'Exit full canvas'}
+              >
+                {isDone ? (
+                  <ChevronsDownUp className="size-4" aria-hidden="true" />
+                ) : (
+                  <Minimize2 className="size-4" aria-hidden="true" />
+                )}
+                {isDone ? 'open dossier' : 'exit full canvas'}
+                <Kbd>esc</Kbd>
+              </button>
             </div>
           </div>
         </div>
@@ -162,7 +201,7 @@ export const ExecutionStage = () => {
         {/* ---------- the six planning derivations ---------- */}
         <div className="relative pt-4">
           <p className="eyebrow pb-2 text-model">dynamic agent planning · derived from your sentence</p>
-          <ol className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+          <ol className="grid gap-3.5 sm:grid-cols-2 xl:grid-cols-3">
             {detail.planning.map((decision) => {
               const gate = planningGate[decision.stage];
               const gateIndex = scenario.steps.findIndex((step) => step.tool === gate);
@@ -171,7 +210,7 @@ export const ExecutionStage = () => {
               return (
                 <li
                   key={decision.stage}
-                  className={`min-w-0 rounded-[2px] border px-3 py-2 transition-colors duration-300 ${
+                  className={`min-w-0 rounded-[2px] border px-4.5 py-3 transition-colors duration-300 ${
                     resolved ? 'anim-fade-up border-model-line bg-model-bg/30' : 'border-line bg-sunken'
                   }`}
                 >
@@ -296,9 +335,9 @@ export const ExecutionStage = () => {
         </div>
 
         {/* ---------- live telemetry ---------- */}
-        <aside className="flex w-full shrink-0 flex-col xl:w-[21rem]">
-          <div className="hair-b px-4 py-3">
-            <p className="eyebrow pb-1.5">live risk</p>
+        <aside className="flex w-full shrink-0 flex-col xl:w-[22rem] 2xl:w-[26rem]">
+          <div className="hair-b px-6 py-4.5">
+            <p className="eyebrow pb-2.5">live risk</p>
             <div className="flex items-end gap-2">
               <span
                 className={`metric text-display tabular-nums transition-colors duration-300 ${
@@ -330,7 +369,7 @@ export const ExecutionStage = () => {
               const IconComponent = Icon as typeof Cpu;
 
               return (
-                <div key={String(label)} className="hair-r px-4 py-3 last:border-r-0">
+                <div key={String(label)} className="hair-r px-6 py-4.5 last:border-r-0">
                   <p className="flex items-center gap-1 text-meta text-faint">
                     <IconComponent className="size-2.5" aria-hidden="true" />
                     {String(label)}
@@ -363,8 +402,8 @@ export const ExecutionStage = () => {
             </ul>
           </div>
 
-          <div className="px-4 py-3">
-            <p className="eyebrow pb-1.5">
+          <div className="px-6 py-4.5">
+            <p className="eyebrow pb-2.5">
               dossier assembling · {unlocked.length} of {scenario.sections.length}
             </p>
             <div className="flex flex-wrap gap-1">
@@ -396,8 +435,8 @@ export const ExecutionStage = () => {
       </div>
 
       {/* ---------- foot: master progress ---------- */}
-      <footer className="hair-t flex items-center gap-3 bg-panel px-4 py-2">
-        <Gauge className="size-3 shrink-0 text-faint" aria-hidden="true" />
+      <footer className="hair-t flex items-center gap-4 bg-panel px-6 py-3">
+        <Gauge className="size-3.5 shrink-0 text-faint" aria-hidden="true" />
         <div className="relative h-[4px] flex-1 overflow-hidden bg-raise">
           <span
             className={`absolute inset-y-0 left-0 transition-[width] duration-100 ${isDone ? 'bg-ok' : 'bg-info'}`}
@@ -408,11 +447,22 @@ export const ExecutionStage = () => {
           {(progress * 100).toFixed(0)}% · {seconds(elapsedMs)} / {seconds(totalMs)}
         </span>
         {isDone && (
-          <span className="flex items-center gap-1 text-meta text-faint">
-            <Rewind className="size-3" aria-hidden="true" />
+          <span className="flex items-center gap-1.5 text-meta text-faint">
+            <Rewind className="size-3.5" aria-hidden="true" />
             replay from the plan rail
           </span>
         )}
+        {/* second exit, at the end of a long scroll: the analyst should never
+            have to scroll back up to leave */}
+        <button
+          type="button"
+          onClick={collapseStage}
+          className="ctl ctl-ghost shrink-0 gap-2 text-meta"
+          aria-label="Exit full canvas"
+        >
+          <Minimize2 className="size-3.5" aria-hidden="true" />
+          exit full canvas
+        </button>
       </footer>
     </section>
   );

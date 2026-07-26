@@ -1,7 +1,10 @@
+import { useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { Radar, Rewind, ScanSearch } from 'lucide-react';
 import { Button } from '@/components/primitives/Button';
 import { EmptyState } from '@/components/primitives/EmptyState';
+import { Collapse, CollapseToggle } from '@/components/primitives/Panel';
+import { useCollapsed } from '@/hooks/useCollapsed';
 import { Skeleton } from '@/components/primitives/Skeleton';
 import { Tone } from '@/components/primitives/Severity';
 import { VizRenderer } from '@/components/viz/VizRenderer';
@@ -33,6 +36,11 @@ const spanClass: Record<DossierSection['span'], string> = {
   third: 'col-span-6 md:col-span-3 xl:col-span-2',
 };
 
+/* Every dossier section folds. A finished investigation is a long document —
+   summary, planning, features, detection, risk, charts, graph, timeline,
+   evidence, explanation, SAR — and an analyst reading one part should be able
+   to park the rest without losing it. The body stays mounted, so a folded
+   chart keeps its selection and a folded table its page. */
 const SectionShell = ({
   section,
   index,
@@ -43,20 +51,37 @@ const SectionShell = ({
   readonly index: number;
   readonly children: ReactNode;
   readonly meta?: string;
-}) => (
-  <section
-    className={`anim-fade-up sheen flex min-h-0 flex-col rounded-[3px] border border-line bg-panel ${spanClass[section.span]}`}
-    style={{ animationDelay: `${String(Math.min(index, 8) * 45)}ms` }}
-    aria-label={section.title}
-  >
-    <header className="panel-head">
-      <h3 className="eyebrow truncate">{section.title}</h3>
-      {meta !== undefined && <span className="truncate text-2xs text-faint">{meta}</span>}
-      <span className="num ml-auto shrink-0 text-meta text-ghost">{section.unlockAfter}</span>
-    </header>
-    <div className="flex min-h-0 flex-1 flex-col">{children}</div>
-  </section>
-);
+}) => {
+  const { shut, toggle } = useCollapsed(`dossier.${section.id}`);
+
+  return (
+    <section
+      data-collapsed={shut ? 'true' : undefined}
+      className={`anim-fade-up sheen flex min-h-0 flex-col rounded-[3px] border border-line bg-panel ${spanClass[section.span]}`}
+      style={{ animationDelay: `${String(Math.min(index, 8) * 45)}ms` }}
+      aria-label={section.title}
+    >
+      <header className="panel-head">
+        <CollapseToggle shut={shut} onToggle={toggle} label={section.title} />
+        <h3 className="eyebrow truncate">
+          <button type="button" onClick={toggle} className="truncate text-left" tabIndex={-1}>
+            {section.title}
+          </button>
+        </h3>
+        {shut ? (
+          <span className="truncate text-2xs text-faint">folded · click to reopen</span>
+        ) : (
+          meta !== undefined && <span className="truncate text-2xs text-faint">{meta}</span>
+        )}
+        <span className="num ml-auto shrink-0 text-meta text-ghost">{section.unlockAfter}</span>
+      </header>
+      <Collapse shut={shut}>
+        {/* the section's original body box, kept so the card lays out unchanged */}
+        <div className="flex min-h-0 flex-1 flex-col">{children}</div>
+      </Collapse>
+    </section>
+  );
+};
 
 const SectionBody = ({ section, scenario }: { readonly section: DossierSection; readonly scenario: Scenario }) => {
   const { query, explanationReady } = useDossierContext();
@@ -125,11 +150,11 @@ const PendingSection = ({ section }: { readonly section: DossierSection }) => (
     className={`flex min-h-[9rem] flex-col rounded-[3px] border border-dashed border-line/70 bg-sunken/60 ${spanClass[section.span]}`}
     aria-hidden="true"
   >
-    <header className="flex h-[var(--panel-head-h)] items-center gap-2 border-b border-line/60 px-2.5">
+    <header className="flex h-[var(--panel-head-h)] items-center gap-2.5 border-b border-line/60 px-[var(--panel-x)]">
       <span className="eyebrow text-ghost">{section.title}</span>
       <span className="num ml-auto text-meta text-ghost">awaiting {section.unlockAfter}</span>
     </header>
-    <div className="flex flex-1 flex-col justify-center gap-2 px-5 py-4">
+    <div className="flex flex-1 flex-col justify-center gap-2.5 px-6 py-5">
       <Skeleton width="72%" />
       <Skeleton width="46%" />
       <Skeleton width="58%" />
@@ -138,8 +163,27 @@ const PendingSection = ({ section }: { readonly section: DossierSection }) => (
 );
 
 export const Dossier = () => {
-  const { scenario, unlocked, phase, expandStage, isBusy } = useAgent();
+  const { scenario, unlocked, phase, expandStage, isBusy, stageExpanded } = useAgent();
   const { requestQuery, navigate } = useWorkspaceActions();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const offset = useRef(0);
+
+  /* Full canvas hides this column rather than unmounting it, but a hidden box
+     has no scroll offset to keep, so the position is banked on the way out and
+     put back on the way in. */
+  useEffect(() => {
+    const element = scrollRef.current;
+
+    if (element === null) {
+      return;
+    }
+
+    if (stageExpanded) {
+      offset.current = element.scrollTop;
+    } else if (offset.current > 0) {
+      element.scrollTop = offset.current;
+    }
+  }, [stageExpanded]);
 
   if (scenario === null) {
     return (
@@ -167,9 +211,9 @@ export const Dossier = () => {
   const pending = scenario.sections.filter((section) => !unlocked.includes(section.id));
 
   return (
-    <div className="scroll min-h-0 flex-1">
-      <div className="hair-b flex flex-wrap items-center gap-3 bg-panel px-5 py-4">
-        <ScanSearch className="size-3.5 shrink-0 text-model" aria-hidden="true" />
+    <div ref={scrollRef} className="scroll min-h-0 flex-1">
+      <div className="hair-b flex flex-wrap items-center gap-4 bg-panel px-7 py-5">
+        <ScanSearch className="size-4.5 shrink-0 text-model" aria-hidden="true" />
         <h2 className="display truncate text-section text-ink">Investigation dossier</h2>
         <Tone kind="model">{scenario.action}</Tone>
         <span className="num text-meta text-faint">
@@ -182,7 +226,7 @@ export const Dossier = () => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-6 gap-4 p-4">
+      <div className="sec-grid grid grid-cols-6 p-6">
         {visible.map((section, index) => (
           <SectionShell
             key={section.id}
@@ -199,7 +243,7 @@ export const Dossier = () => {
       </div>
 
       {scenario.explanation === null && unlocked.length > 0 && (
-        <div className="hair-t mx-2 mb-2 flex items-start gap-3 border border-line bg-panel px-5 py-4">
+        <div className="hair-t mx-6 mb-6 flex items-start gap-4 border border-line bg-panel px-6 py-5">
           <Tone kind="neutral">by design</Tone>
           <p className="max-w-[92ch] text-label leading-relaxed text-muted">
             {scenario.noExplanationReason}

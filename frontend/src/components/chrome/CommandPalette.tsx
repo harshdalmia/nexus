@@ -178,8 +178,8 @@ export const CommandPalette = () => {
         className="anim-scale-in overlay-shadow absolute top-[14vh] left-1/2 flex w-[min(680px,92vw)] -translate-x-1/2 flex-col border border-edge bg-panel"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="flex items-center gap-2.5 border-b border-line px-4 py-3.5">
-          <Search className="size-3.5 shrink-0 text-faint" aria-hidden="true" />
+        <div className="flex items-center gap-3.5 border-b border-line px-5 py-4.5">
+          <Search className="size-4.5 shrink-0 text-faint" aria-hidden="true" />
           <input
             ref={inputRef}
             value={value}
@@ -214,7 +214,7 @@ export const CommandPalette = () => {
         <div className="scroll max-h-[52vh] py-1">
           {grouped.map(({ klass, items }) => (
             <div key={klass} className="pb-1">
-              <p className={`eyebrow px-3 py-1 ${classTone[klass]}`}>{classLabel[klass]}</p>
+              <p className={`eyebrow px-5 py-2 ${classTone[klass]}`}>{classLabel[klass]}</p>
               {items.map((command) => {
                 runningIndex += 1;
                 const index = runningIndex;
@@ -227,11 +227,11 @@ export const CommandPalette = () => {
                     type="button"
                     onMouseEnter={() => setCursor(index)}
                     onClick={command.run}
-                    className={`flex w-full items-center gap-2.5 px-3 py-1.5 text-left transition-colors duration-75 ${
+                    className={`flex w-full items-center gap-3 px-5 py-2.5 text-left transition-colors duration-75 ${
                       isActive ? 'bg-sel' : 'hover:bg-raise'
                     }`}
                   >
-                    <Icon className={`size-3.5 shrink-0 ${classTone[command.klass]}`} aria-hidden="true" />
+                    <Icon className={`size-4 shrink-0 ${classTone[command.klass]}`} aria-hidden="true" />
                     <span
                       className={`flex-1 truncate text-dense ${
                         command.klass === 'jump' ? 'font-mono' : ''
@@ -254,7 +254,7 @@ export const CommandPalette = () => {
           )}
         </div>
 
-        <footer className="flex items-center gap-3 border-t border-line px-3 py-1.5 text-meta text-faint">
+        <footer className="flex items-center gap-4 border-t border-line px-5 py-3 text-meta text-faint">
           <span className="flex items-center gap-1">
             <Kbd>↑</Kbd>
             <Kbd>↓</Kbd> navigate

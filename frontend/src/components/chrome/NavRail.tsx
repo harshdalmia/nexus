@@ -19,31 +19,27 @@ export const NavRail = () => {
     <nav
       aria-label="Workspaces"
       className={`hair-r flex shrink-0 flex-col bg-sunken transition-[width] duration-200 ${
-        railCollapsed ? 'w-[62px]' : 'w-[248px]'
+        railCollapsed ? 'w-[74px]' : 'w-[272px]'
       }`}
     >
-      {/* wordmark plate */}
-      <div className="hair-b flex h-16 items-center gap-3 bg-panel px-4 shadow-[var(--elev-1)]">
-        <span className="grid size-6 shrink-0 place-items-center rounded-[2px] border border-info-line bg-info-bg">
-          <ShieldHalf className="size-3.5 text-info" aria-hidden="true" />
+      {/* Logo plate — mark only, centred in both rail widths. The product name
+          already sits in the command bar and the browser title, so repeating it
+          here only competed with the navigation. */}
+      <div className="hair-b flex h-20 items-center justify-center bg-panel px-4 shadow-[var(--elev-1)]">
+        <span
+          className="grid size-10 shrink-0 place-items-center rounded-[3px] border border-info-line bg-info-bg shadow-[var(--elev-1)]"
+          title="Sentinel — financial intelligence"
+        >
+          <ShieldHalf className="size-5 text-info" aria-hidden="true" />
+          <span className="sr-only">Sentinel — financial intelligence</span>
         </span>
-        {!railCollapsed && (
-          <span className="flex min-w-0 flex-col leading-none">
-            <span className="display truncate text-body tracking-[0.16em] text-ink uppercase">
-              Sentinel
-            </span>
-            <span className="truncate pt-0.5 text-meta tracking-[0.14em] text-faint uppercase">
-              financial intelligence
-            </span>
-          </span>
-        )}
       </div>
 
-      <div className="scroll flex min-h-0 flex-1 flex-col gap-2.5 py-2.5">
+      <div className="scroll flex min-h-0 flex-1 flex-col gap-5 py-4">
         {groups.map((group) => (
-          <div key={group} className="flex flex-col">
+          <div key={group} className="flex flex-col gap-0.5">
             {!railCollapsed && (
-              <p className="flex items-center gap-2 px-3 pb-1.5">
+              <p className="flex items-center gap-2.5 px-5 pb-2.5">
                 <span className="eyebrow">{groupLabels[group]}</span>
                 <span aria-hidden="true" className="h-px flex-1 bg-line" />
               </p>
@@ -60,7 +56,7 @@ export const NavRail = () => {
                     onClick={() => navigate(id)}
                     aria-current={isActive ? 'page' : undefined}
                     title={railCollapsed ? `${label} (g then ${hotkey})` : undefined}
-                    className={`group relative flex h-11 items-center gap-3 pr-3 pl-4 text-body transition-colors duration-150 ${
+                    className={`group relative flex h-13 items-center gap-3.5 pr-4 pl-5 text-body transition-colors duration-150 ${
                       isActive
                         ? 'bg-panel text-ink shadow-[var(--elev-1)]'
                         : 'text-muted hover:bg-panel/60 hover:text-dim'
@@ -73,7 +69,7 @@ export const NavRail = () => {
                       }`}
                     />
                     <Icon
-                      className={`size-4 shrink-0 ${isActive ? 'text-info' : 'text-faint group-hover:text-muted'}`}
+                      className={`size-4.5 shrink-0 ${isActive ? 'text-info' : 'text-faint group-hover:text-muted'}`}
                       aria-hidden="true"
                     />
                     {!railCollapsed && (
@@ -95,8 +91,8 @@ export const NavRail = () => {
         ))}
 
         {!railCollapsed && (
-          <div className="flex flex-col">
-            <p className="flex items-center gap-2 px-3 pt-1 pb-1.5">
+          <div className="flex flex-col gap-0.5">
+            <p className="flex items-center gap-2.5 px-5 pt-1 pb-2.5">
               <span className="eyebrow">saved views</span>
               <span aria-hidden="true" className="h-px flex-1 bg-line" />
             </p>
@@ -109,7 +105,7 @@ export const NavRail = () => {
                   navigate('ledger');
                   notify('View applied', `${label} · ${filters.join(' · ')}`, 'info');
                 }}
-                className="group flex h-10 items-center gap-2.5 px-4 text-label text-muted transition-colors hover:bg-panel/60 hover:text-ink"
+                className="group flex h-11 items-center gap-3 px-5 text-label text-muted transition-colors hover:bg-panel/60 hover:text-ink"
               >
                 <span
                   aria-hidden="true"
@@ -123,17 +119,21 @@ export const NavRail = () => {
         )}
       </div>
 
-      <div className="hair-t flex items-center gap-2 bg-panel px-3 py-2.5">
+      <div
+        className={`hair-t flex items-center gap-2.5 bg-panel px-4 py-3.5 ${
+          railCollapsed ? 'justify-center' : ''
+        }`}
+      >
         <button
           type="button"
           onClick={toggleRail}
-          className="grid size-6 place-items-center rounded-[2px] text-faint transition-colors hover:bg-raise hover:text-ink"
+          className="grid size-8 place-items-center rounded-[2px] text-faint transition-colors hover:bg-raise hover:text-ink"
           aria-label={railCollapsed ? 'Expand navigation' : 'Collapse navigation'}
         >
           {railCollapsed ? (
-            <PanelLeftOpen className="size-3.5" aria-hidden="true" />
+            <PanelLeftOpen className="size-4.5" aria-hidden="true" />
           ) : (
-            <PanelLeftClose className="size-3.5" aria-hidden="true" />
+            <PanelLeftClose className="size-4.5" aria-hidden="true" />
           )}
         </button>
         {!railCollapsed && (

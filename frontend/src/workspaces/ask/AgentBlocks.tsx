@@ -24,7 +24,7 @@ const Row = ({
   readonly wide?: boolean;
 }) => (
   <div className={wide === true ? 'col-span-2' : undefined}>
-    <p className="eyebrow pb-1">{label}</p>
+    <p className="eyebrow pb-2">{label}</p>
     {children}
   </div>
 );
@@ -42,7 +42,7 @@ export const ExecutionSummaryBlock = ({ scenario }: { readonly scenario: Scenari
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="grid gap-x-8 gap-y-4 px-4 py-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-x-8 gap-y-4 px-6 py-5 sm:grid-cols-2 xl:grid-cols-4">
         <Row label="original query">
           <p className="max-w-[46ch] text-body-lg leading-snug text-ink">“{query || scenario.query}”</p>
         </Row>
@@ -99,7 +99,7 @@ export const ExecutionSummaryBlock = ({ scenario }: { readonly scenario: Scenari
         </Row>
       </div>
 
-      <div className="hair-t grid gap-x-8 gap-y-4 px-4 py-4 md:grid-cols-2">
+      <div className="hair-t grid gap-x-8 gap-y-4 px-6 py-5 md:grid-cols-2">
         <div>
           <p className="eyebrow pb-2">selected tools · {selected.length}</p>
           <ul className="flex flex-wrap gap-1.5">
@@ -145,8 +145,8 @@ export const ExecutionSummaryBlock = ({ scenario }: { readonly scenario: Scenari
         </div>
       </div>
 
-      <div className="hair-t px-4 py-4">
-        <p className="eyebrow pb-1">investigation summary</p>
+      <div className="hair-t px-6 py-5">
+        <p className="eyebrow pb-2">investigation summary</p>
         <p className="max-w-[104ch] text-read text-ink">{detail.investigationSummary}</p>
       </div>
     </div>
@@ -170,7 +170,7 @@ export const PlanningBlock = ({ scenario }: { readonly scenario: Scenario }) => 
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="grid gap-3 px-4 py-4 md:grid-cols-2 xl:grid-cols-3">
+      <div className="grid gap-5 px-6 py-5 md:grid-cols-2 xl:grid-cols-3">
         {detail.planning.map((decision) => (
           <article
             key={decision.stage}
@@ -191,7 +191,7 @@ export const PlanningBlock = ({ scenario }: { readonly scenario: Scenario }) => 
         ))}
       </div>
 
-      <div className="hair-t px-4 py-3">
+      <div className="hair-t px-6 py-4.5">
         <button
           type="button"
           onClick={() => setOpenDecisions((open) => !open)}
@@ -214,7 +214,7 @@ export const PlanningBlock = ({ scenario }: { readonly scenario: Scenario }) => 
             {scenario.steps.map((step) => (
               <li
                 key={step.tool}
-                className="grid gap-x-3 gap-y-1 rounded-[2px] border border-line bg-raise px-3 py-2 md:grid-cols-[10rem_5.5rem_minmax(0,1fr)] md:items-baseline"
+                className="grid gap-x-3 gap-y-1 rounded-[2px] border border-line bg-raise px-4.5 py-3 md:grid-cols-[10rem_5.5rem_minmax(0,1fr)] md:items-baseline"
               >
                 <span className="text-label font-medium text-ink">{toolLabel(step)}</span>
                 <span>
@@ -250,7 +250,7 @@ export const FeatureBlock = ({ scenario, note }: { readonly scenario: Scenario; 
         type="button"
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
-        className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-3.5 text-left transition-colors hover:bg-raise/60"
+        className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-6 py-5 text-left transition-colors hover:bg-raise/60"
       >
         {open ? (
           <ChevronDown className="size-3.5 shrink-0 text-faint" aria-hidden="true" />
@@ -328,7 +328,7 @@ export const FeatureBlock = ({ scenario, note }: { readonly scenario: Scenario; 
         </div>
       )}
 
-      <p className="hair-t mt-auto px-4 py-2.5 text-meta leading-relaxed text-faint">
+      <p className="hair-t mt-auto px-6 py-4 text-meta leading-relaxed text-faint">
         {note ??
           'Features are tagged to typologies, so the builder computes only the subset the detected pattern needs. The rest are listed with the reason they were left alone.'}
       </p>
@@ -351,7 +351,7 @@ export const DetectionBlock = ({ scenario }: { readonly scenario: Scenario }) =>
 
   if (detection === null) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col gap-2 px-4 py-4">
+      <div className="flex min-h-0 flex-1 flex-col gap-2 px-6 py-5">
         <Tone kind="neutral">no model ran</Tone>
         <p className="max-w-[86ch] text-read text-muted">
           The detection engine was declined for this query, so there is no model, score or threshold to report.
@@ -369,7 +369,7 @@ export const DetectionBlock = ({ scenario }: { readonly scenario: Scenario }) =>
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="grid gap-x-8 gap-y-4 px-4 py-4 sm:grid-cols-2">
+      <div className="grid gap-x-8 gap-y-4 px-6 py-5 sm:grid-cols-2">
         <Row label="anomaly type">
           <p className="max-w-[34ch] text-card leading-snug text-ink">{detection.anomalyType}</p>
         </Row>
@@ -420,7 +420,7 @@ export const DetectionBlock = ({ scenario }: { readonly scenario: Scenario }) =>
         </Row>
       </div>
 
-      <div className="hair-t px-4 py-4">
+      <div className="hair-t px-6 py-5">
         <p className="eyebrow pb-2">models used</p>
         <ul className="flex flex-col gap-1.5">
           {detection.models.map((model) => (
@@ -434,7 +434,7 @@ export const DetectionBlock = ({ scenario }: { readonly scenario: Scenario }) =>
         </ul>
       </div>
 
-      <div className="hair-t px-4 py-4">
+      <div className="hair-t px-6 py-5">
         <p className="eyebrow pb-2">top contributing features</p>
         <ul className="flex flex-col gap-2">
           {detection.topFeatures.map((item) => (
@@ -465,7 +465,7 @@ export const RiskBlock = ({ scenario }: { readonly scenario: Scenario }) => {
 
   if (risk === null) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col gap-2 px-4 py-4">
+      <div className="flex min-h-0 flex-1 flex-col gap-2 px-6 py-5">
         <Tone kind="neutral">no risk assigned</Tone>
         <p className="max-w-[86ch] text-read text-muted">
           The risk engine was declined because nothing was detected. Any score shown elsewhere in this dossier is
@@ -477,9 +477,9 @@ export const RiskBlock = ({ scenario }: { readonly scenario: Scenario }) => {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex flex-wrap items-end gap-x-8 gap-y-4 px-4 py-4">
+      <div className="flex flex-wrap items-end gap-x-8 gap-y-4 px-6 py-5">
         <div>
-          <p className="eyebrow pb-1">risk score</p>
+          <p className="eyebrow pb-2">risk score</p>
           <p
             className={`metric text-display ${
               risk.severity === 'severe' ? 'text-sev' : risk.severity === 'review' ? 'text-rev' : 'text-ok'
@@ -490,7 +490,7 @@ export const RiskBlock = ({ scenario }: { readonly scenario: Scenario }) => {
           </p>
         </div>
         <div>
-          <p className="eyebrow pb-1">risk category</p>
+          <p className="eyebrow pb-2">risk category</p>
           <p className="flex items-center gap-2">
             <SeverityTag severity={risk.severity}>{risk.level}</SeverityTag>
             <ScoreValue score={risk.score} />
@@ -498,7 +498,7 @@ export const RiskBlock = ({ scenario }: { readonly scenario: Scenario }) => {
           <p className="num pt-1.5 text-meta text-faint">band {risk.band}</p>
         </div>
         <div>
-          <p className="eyebrow pb-1">confidence</p>
+          <p className="eyebrow pb-2">confidence</p>
           <p className="metric text-metric text-ink">
             {typeof risk.confidence === 'number'
               ? `${String(Math.round(risk.confidence * 100))}%`
@@ -507,12 +507,12 @@ export const RiskBlock = ({ scenario }: { readonly scenario: Scenario }) => {
         </div>
       </div>
 
-      <div className="hair-t px-4 py-4">
-        <p className="eyebrow pb-1">reason</p>
+      <div className="hair-t px-6 py-5">
+        <p className="eyebrow pb-2">reason</p>
         <p className="max-w-[100ch] text-read text-ink">{risk.reason}</p>
       </div>
 
-      <div className="hair-t grid gap-x-8 gap-y-4 px-4 py-4 md:grid-cols-2">
+      <div className="hair-t grid gap-x-8 gap-y-4 px-6 py-5 md:grid-cols-2">
         <div>
           <p className="eyebrow pb-2">supporting evidence</p>
           <ul className="flex flex-col gap-1.5">
@@ -590,11 +590,11 @@ export const CapabilityStrip = ({ onAsk }: { readonly onAsk: (query: string) => 
       </span>
     </p>
 
-    <ol className="grid gap-2 md:grid-cols-2 xl:grid-cols-5">
+    <ol className="grid gap-3.5 md:grid-cols-2 xl:grid-cols-5">
       {capabilities.map(([title, body], index) => (
         <li
           key={title}
-          className="flex min-w-0 flex-col gap-1 rounded-[2px] border border-line bg-raise px-3 py-2.5 shadow-[var(--elev-1)]"
+          className="flex min-w-0 flex-col gap-1 rounded-[2px] border border-line bg-raise px-4.5 py-3.5 shadow-[var(--elev-1)]"
         >
           <p className="flex items-baseline gap-2">
             <span className="num text-meta text-model">{String(index + 1).padStart(2, '0')}</span>
@@ -613,7 +613,7 @@ export const CapabilityStrip = ({ onAsk }: { readonly onAsk: (query: string) => 
             <button
               type="button"
               onClick={() => onAsk(example.query)}
-              className="group flex max-w-[26rem] flex-col items-start gap-0.5 rounded-[2px] border border-line bg-raise px-3 py-2 text-left transition-colors hover:border-info-line hover:bg-info-bg/40"
+              className="group flex max-w-[26rem] flex-col items-start gap-0.5 rounded-[2px] border border-line bg-raise px-4.5 py-3 text-left transition-colors hover:border-info-line hover:bg-info-bg/40"
             >
               <span className="text-body text-ink">“{example.query}”</span>
               <span className="num text-meta text-faint">{example.meta}</span>

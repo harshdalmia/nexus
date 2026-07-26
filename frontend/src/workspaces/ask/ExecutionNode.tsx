@@ -123,7 +123,7 @@ export const ExecutionNode = ({ step, state, progress, age, isLast }: ExecutionN
           type="button"
           onClick={() => setManualOpen(!isOpen)}
           aria-expanded={isOpen}
-          className="flex w-full items-center gap-2 px-4 py-2.5 text-left"
+          className="flex w-full items-center gap-2 px-6 py-4 text-left"
         >
           <span
             className={`truncate text-dense font-semibold tracking-tight ${
@@ -175,15 +175,15 @@ export const ExecutionNode = ({ step, state, progress, age, isLast }: ExecutionN
         )}
 
         {state === 'failed' && step.detail !== undefined && (
-          <p className="border-t border-sev-line/50 px-4 py-2.5 font-mono text-meta leading-relaxed text-sev">
+          <p className="border-t border-sev-line/50 px-6 py-4 font-mono text-meta leading-relaxed text-sev">
             {step.detail}
           </p>
         )}
 
         {isOpen && state !== 'skipped' && state !== 'queued' && hasArtifacts && (
           <div className="anim-fade grid gap-0 border-t border-line/70 sm:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
-            <div className="hair-r px-4 py-2.5">
-              <p className="eyebrow pb-1">input</p>
+            <div className="hair-r px-6 py-4">
+              <p className="eyebrow pb-2">input</p>
               {(step.inputs ?? []).map((artifact) => (
                 <p key={artifact.label} className="flex items-baseline gap-1.5 text-meta">
                   <span className="text-faint">{artifact.label}</span>
@@ -194,8 +194,8 @@ export const ExecutionNode = ({ step, state, progress, age, isLast }: ExecutionN
                 <p className="text-meta text-faint">upstream state</p>
               )}
             </div>
-            <div className="px-4 py-2.5">
-              <p className="eyebrow pb-1">output</p>
+            <div className="px-6 py-4">
+              <p className="eyebrow pb-2">output</p>
               <div className="flex flex-col gap-0.5">
                 {(step.outputs ?? []).map((artifact) => (
                   <p key={artifact.label} className="flex items-baseline gap-2 text-meta">

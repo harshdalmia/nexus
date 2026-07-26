@@ -118,7 +118,7 @@ export const AlertQueue = () => {
   ];
 
   return (
-    <Panel className="hair-b min-h-0 flex-[3] border-0">
+    <Panel collapseId="watchtower.queue" className="hair-b min-h-0 flex-[3] border-0">
       <PanelHead
         title="triage queue"
         meta={
@@ -126,6 +126,12 @@ export const AlertQueue = () => {
             {live
               ? `${String(rows.length)} case(s) opened this session · ordered by engine risk`
               : `${String(rows.length)} demo cases · run a query in Ask to fill the queue`}
+          </span>
+        }
+        /* folded, the header still carries the count that matters */
+        summary={
+          <span className="truncate text-label text-faint">
+            folded · {String(rows.length)} case{rows.length === 1 ? '' : 's'} in the queue
           </span>
         }
         actions={
@@ -160,21 +166,21 @@ export const AlertQueue = () => {
           />
         }
         renderPeek={(row) => (
-          <div className="flex flex-wrap items-start gap-x-10 gap-y-3">
+          <div className="flex flex-wrap items-start gap-x-12 gap-y-6">
             <div>
-              <p className="eyebrow pb-1">exposure</p>
+              <p className="eyebrow pb-2">exposure</p>
               <p className="num text-body text-ink">{row.exposure}</p>
             </div>
             <div>
-              <p className="eyebrow pb-1">opened</p>
+              <p className="eyebrow pb-2">opened</p>
               <p className="num text-body text-muted">{row.opened}</p>
             </div>
             <div>
-              <p className="eyebrow pb-1">escalation</p>
+              <p className="eyebrow pb-2">escalation</p>
               <p className="text-body text-muted">{row.session?.escalation ?? stageLabel[row.stage]}</p>
             </div>
             <div className="max-w-[46ch]">
-              <p className="eyebrow pb-1">agent summary</p>
+              <p className="eyebrow pb-2">agent summary</p>
               <p className="text-body leading-relaxed text-muted">
                 {row.session
                   ? `${row.session.evidenceCount} evidence record(s) over ${row.session.transactionCount.toLocaleString('en-US')} transactions, from “${row.session.query}”.`

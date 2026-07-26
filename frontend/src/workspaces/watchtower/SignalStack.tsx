@@ -140,8 +140,8 @@ export const SignalStack = () => {
   const activity = events.slice(0, 6);
 
   return (
-    <div className="hair-l flex min-h-0 w-full shrink-0 flex-col lg:w-[21rem]">
-      <Panel className="hair-b min-h-0 flex-1 border-0">
+    <div className="hair-l flex min-h-0 w-full shrink-0 flex-col lg:w-[22rem] 2xl:w-[26rem]">
+      <Panel collapseId="watchtower.signal" className="hair-b min-h-0 flex-1 border-0">
         <PanelHead title="signal" meta="what changed, and what to do about it" />
         <div className="scroll min-h-0 flex-1">
           {signals.map((signal) => {
@@ -150,7 +150,7 @@ export const SignalStack = () => {
             return (
               <article
                 key={signal.id}
-                className={`hair-b border-l-2 px-4 py-3.5 ${toneClass[signal.severity]}`}
+                className={`hair-b border-l-2 px-6 py-5 ${toneClass[signal.severity]}`}
               >
                 <p className="flex items-start gap-2 text-body-lg font-semibold text-ink">
                   <Icon className="mt-px size-3.5 shrink-0 opacity-80" aria-hidden="true" />
@@ -168,14 +168,14 @@ export const SignalStack = () => {
               </article>
             );
           })}
-          <p className="px-4 py-2.5 text-meta leading-relaxed text-faint">
+          <p className="px-6 py-4 text-meta leading-relaxed text-faint">
             Standing conditions need a persistent backend to compute; these three are
             illustrative until one exists.
           </p>
         </div>
       </Panel>
 
-      <Panel className="hair-b shrink-0 border-0">
+      <Panel collapseId="watchtower.model" className="hair-b shrink-0 border-0">
         <PanelHead
           title={series === null ? 'alert trend' : 'volume trend'}
           meta={
@@ -187,7 +187,7 @@ export const SignalStack = () => {
         <VizRenderer spec={series === null ? demoTrend : liveTrend(series)} />
       </Panel>
 
-      <Panel className="hair-b shrink-0 border-0">
+      <Panel collapseId="watchtower.sla" className="hair-b shrink-0 border-0">
         <PanelHead
           title="workload"
           meta={
@@ -196,7 +196,7 @@ export const SignalStack = () => {
             </span>
           }
         />
-        <div className="px-4 py-3">
+        <div className="px-6 py-4.5">
           <MeterList>
             {workloadRows.map(({ label, value, total: rowTotal, severity }) => (
               <Meter
@@ -212,7 +212,7 @@ export const SignalStack = () => {
         </div>
       </Panel>
 
-      <Panel className="shrink-0 border-0">
+      <Panel collapseId="watchtower.activity" className="shrink-0 border-0">
         <PanelHead
           title="session activity"
           meta={
@@ -221,7 +221,7 @@ export const SignalStack = () => {
             </span>
           }
         />
-        <ul className="flex flex-col px-4 py-2.5">
+        <ul className="flex flex-col px-6 py-4">
           {activity.length === 0
             ? analystActivity.slice(0, 4).map((entry) => (
                 <li key={entry.time} className="flex items-baseline gap-2 py-[3px]">

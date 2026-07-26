@@ -10,7 +10,7 @@ import { severityOfLevel } from '@/types/aml';
 import type { EscalationAction, Explanation } from '@/types/aml';
 
 export const ExplanationSkeleton = () => (
-  <div className="px-5 py-4">
+  <div className="px-7 py-5">
     <div className="flex items-center gap-2 pb-2">
       <Tone kind="model">explainability running</Tone>
       <span className="text-2xs text-faint">
@@ -86,8 +86,8 @@ export const ExplanationCard = ({ explanation, query }: ExplanationCardProps) =>
       <p className="max-w-[72ch] px-5 pt-1.5 pb-5 text-read whitespace-pre-line text-ink">{narrative}</p>
 
       <div className="hair-t grid gap-0 lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-        <div className="hair-r px-4 py-3.5">
-          <p className="eyebrow pb-1.5">evidence · linked to this flag</p>
+        <div className="hair-r px-6 py-5">
+          <p className="eyebrow pb-2.5">evidence · linked to this flag</p>
           <ul className="flex flex-col gap-1">
             {evidence.map((item) => (
               <li key={item} className="group flex items-start gap-2">
@@ -115,8 +115,8 @@ export const ExplanationCard = ({ explanation, query }: ExplanationCardProps) =>
           </ul>
         </div>
 
-        <div className="px-4 py-3.5">
-          <p className="eyebrow pb-1.5">score composition</p>
+        <div className="px-6 py-5">
+          <p className="eyebrow pb-2.5">score composition</p>
           <MeterList>
             {breakdown.map((component) => (
               <Meter
@@ -207,7 +207,7 @@ export const RecommendationCard = ({ explanation }: { readonly explanation: Expl
   const { activeCaseId } = useWorkspaceState();
 
   return (
-    <div className={`flex flex-wrap items-start gap-3 border-l-2 px-5 py-4 ${className}`}>
+    <div className={`flex flex-wrap items-start gap-3 border-l-2 px-7 py-5 ${className}`}>
       <ActionIcon className="mt-0.5 size-4 shrink-0" aria-hidden="true" />
       <div className="min-w-[18rem] flex-1">
         <p className="flex flex-wrap items-baseline gap-2">

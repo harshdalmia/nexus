@@ -21,7 +21,7 @@ const stepTone: Record<Severity, { readonly bar: string; readonly text: string; 
  * figure, so the narrowing is quantified rather than merely illustrated.
  */
 export const Pyramid = ({ steps }: PyramidProps) => (
-  <ol className="flex flex-col items-center gap-1 px-3 py-2.5">
+  <ol className="flex flex-col items-center gap-1 px-4.5 py-3.5">
     {steps.map(({ label, value, width, severity }, index) => {
       const previous = steps[index - 1];
       const retained = previous === undefined ? null : value / previous.value;

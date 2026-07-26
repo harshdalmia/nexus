@@ -38,7 +38,7 @@ export const QueryConsole = () => {
 
   return (
     <section className="hair-b relative bg-panel">
-      <form onSubmit={submit} className="flex items-center gap-2 px-4 py-3" autoComplete="off">
+      <form onSubmit={submit} className="flex items-center gap-3.5 px-6 py-6" autoComplete="off">
         <label htmlFor="agent-query" className="sr-only">
           Natural language query
         </label>
@@ -72,7 +72,7 @@ export const QueryConsole = () => {
       </form>
 
       {phase === 'idle' && (
-        <div className="flex flex-wrap items-center gap-1.5 px-3 pb-2">
+        <div className="flex flex-wrap items-center gap-2.5 px-6 pb-5">
           <span className="eyebrow shrink-0">try</span>
           {scenarios.map((scenario) => (
             <button
@@ -82,7 +82,7 @@ export const QueryConsole = () => {
                 setValue(scenario.query);
                 run(scenario.query);
               }}
-              className="ctl h-[21px] px-1.5 text-label"
+              className="ctl h-8 px-3 text-label"
             >
               {scenario.query}
               <span className="num pl-1.5 text-meta text-faint">

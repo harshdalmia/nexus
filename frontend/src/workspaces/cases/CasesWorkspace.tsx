@@ -30,7 +30,7 @@ export const CasesWorkspace = () => {
       <div className="hair-b flex min-h-0 flex-[3] flex-col lg:flex-row">
         <CaseIndex />
 
-        <Panel className="min-h-0 flex-1 border-0">
+        <Panel collapseId="cases.graph" className="min-h-0 flex-1 border-0">
           <PanelHead
             title="money flow"
             meta={
@@ -88,7 +88,7 @@ export const CasesWorkspace = () => {
             expanded={expanded}
             {...(graph === null ? {} : { nodes: graph.nodes, edges: graph.edges })}
           />
-          <div className="hair-t flex flex-wrap items-center gap-x-4 gap-y-1 px-4 py-2.5 text-meta text-faint">
+          <div className="hair-t flex flex-wrap items-center gap-x-4 gap-y-1 px-6 py-4 text-meta text-faint">
             <span className="flex items-center gap-1.5">
               <span className="inline-block size-2 rounded-full border border-sev" aria-hidden="true" />
               account / hub

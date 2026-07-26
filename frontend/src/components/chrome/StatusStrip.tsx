@@ -53,7 +53,7 @@ export const StatusStrip = () => {
   const lamp = engineLamp[state];
 
   return (
-    <footer className="hair-t flex h-9 shrink-0 items-center gap-5 bg-sunken px-5 text-meta tracking-tight text-faint shadow-[var(--elev-1)]">
+    <footer className="hair-t flex h-11 shrink-0 items-center gap-7 bg-sunken px-7 text-meta tracking-tight text-faint shadow-[var(--elev-1)]">
       <span className={`flex items-center gap-1.5 ${lamp.tone}`} title={health?.error ?? undefined}>
         <span
           aria-hidden="true"

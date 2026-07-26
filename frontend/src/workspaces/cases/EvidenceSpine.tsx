@@ -39,10 +39,11 @@ export const EvidenceSpine = () => {
   const items = spine.filter((item) => item.caseId === activeCaseId);
 
   return (
-    <Panel className="hair-r min-h-0 w-full border-0 xl:w-[24rem]">
+    <Panel collapseId="cases.evidence" className="hair-r min-h-0 w-full border-0 xl:w-[25rem] 2xl:w-[29rem]">
       <PanelHead
         title="evidence spine"
         meta={`${String(items.length)} items · order drives the SAR narrative`}
+        summary={`folded · ${String(items.length)} pinned item${items.length === 1 ? '' : 's'} kept`}
         actions={
           <Button size="xs" variant="primary" onClick={() => navigate('reports')} disabled={items.length === 0}>
             <FileSignature className="size-3" aria-hidden="true" />
@@ -64,7 +65,7 @@ export const EvidenceSpine = () => {
             const Icon = kindIcon[item.kind];
 
             return (
-              <li key={item.id} className="hair-b group flex items-start gap-2 px-4 py-3">
+              <li key={item.id} className="hair-b group flex items-start gap-2 px-6 py-4.5">
                 <span className="num mt-px w-4 shrink-0 text-meta text-faint">{index + 1}</span>
                 <Icon className="mt-0.5 size-3 shrink-0 text-info" aria-hidden="true" />
                 <span className="min-w-0 flex-1">

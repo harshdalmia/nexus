@@ -63,7 +63,7 @@ export const GraphWorkspace = () => {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col xl:flex-row">
-      <Panel className="min-h-0 flex-1 border-0">
+      <Panel collapseId="graph.canvas" className="min-h-0 flex-1 border-0">
         <PanelHead
           title="entity canvas"
           meta={
@@ -175,11 +175,11 @@ export const GraphWorkspace = () => {
         )}
       </Panel>
 
-      <Panel className="hair-l min-h-0 w-full shrink-0 border-0 xl:w-[22rem]">
+      <Panel collapseId="graph.inspector" className="hair-l min-h-0 w-full shrink-0 border-0 xl:w-[23rem] 2xl:w-[27rem]">
         <PanelHead title="entity inspector" meta={entityKindLabel[node.kind]} />
 
         <div className="scroll min-h-0 flex-1">
-          <section className="hair-b px-4 py-3.5">
+          <section className="hair-b px-6 py-5">
             <p className="flex items-center gap-2">
               <span className="num text-card font-medium text-ink">{node.id}</span>
               <SeverityTag severity={node.severity} />
@@ -218,8 +218,8 @@ export const GraphWorkspace = () => {
             </div>
           </section>
 
-          <section className="hair-b px-4 py-3.5">
-            <p className="eyebrow pb-1.5">facts</p>
+          <section className="hair-b px-6 py-5">
+            <p className="eyebrow pb-2.5">facts</p>
             <dl className="flex flex-col">
               {node.facts.map(([key, value]) => (
                 <div key={key} className="flex items-baseline justify-between gap-3 py-[3px]">
@@ -230,8 +230,8 @@ export const GraphWorkspace = () => {
             </dl>
           </section>
 
-          <section className="px-4 py-3.5">
-            <p className="eyebrow pb-1.5">connections · {connections.length}</p>
+          <section className="px-6 py-5">
+            <p className="eyebrow pb-2.5">connections · {connections.length}</p>
             <ul className="flex flex-col">
               {connections.map(({ edge, other, direction }) => (
                 <li key={edge.id} className="flex items-start gap-2 py-[3px]">
@@ -257,7 +257,7 @@ export const GraphWorkspace = () => {
           </section>
         </div>
 
-        <footer className="hair-t px-4 py-2.5 text-meta leading-relaxed text-faint">
+        <footer className="hair-t px-6 py-4 text-meta leading-relaxed text-faint">
           Centrality from NetworkX betweenness over the 30-day transaction graph. Clicking a node
           re-scopes the ledger, analytics and assistant to that entity.
         </footer>

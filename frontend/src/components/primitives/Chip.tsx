@@ -30,7 +30,7 @@ export const Chip = ({
   const body = (
     <>
       {prefix !== undefined && (
-        <span className="-ml-2 mr-1 flex h-full items-center border-r border-inherit bg-sunken/70 px-1.5 text-meta tracking-wider text-faint uppercase">
+        <span className="-ml-2.5 mr-1.5 flex h-full items-center border-r border-inherit bg-sunken/70 px-2.5 text-meta tracking-wider text-faint uppercase">
           {prefix}
         </span>
       )}
@@ -40,11 +40,12 @@ export const Chip = ({
 
   return (
     <span
-      /* 26px tall with real gutters: scope and filter chips are read constantly and
-         were previously too tight to scan or hit comfortably. */
-      className={`inline-flex h-[26px] max-w-[18rem] items-center gap-1.5 overflow-hidden rounded-[2px] border text-label transition-colors duration-130 ${
+      /* 32px tall with real gutters: scope and filter chips are read constantly
+         and clicked constantly, so they match control height rather than
+         squeezing under it. */
+      className={`inline-flex h-8 max-w-[22rem] items-center gap-2 overflow-hidden rounded-[2px] border text-label transition-colors duration-130 ${
         active ? 'border-info-line bg-info-bg text-info' : tones[tone]
-      } ${prefix === undefined ? 'px-2' : 'pr-2 pl-2'}`}
+      } ${prefix === undefined ? 'px-3' : 'pr-3 pl-2.5'}`}
     >
       {onClick === undefined ? (
         <span className="inline-flex h-full items-center gap-1 truncate">{body}</span>
@@ -58,9 +59,9 @@ export const Chip = ({
           type="button"
           onClick={onRemove}
           aria-label="Remove filter"
-          className="grid size-4 shrink-0 place-items-center rounded-[1px] text-faint transition-colors hover:bg-sev-bg hover:text-sev"
+          className="grid size-5 shrink-0 place-items-center rounded-[1px] text-faint transition-colors hover:bg-sev-bg hover:text-sev"
         >
-          <X className="size-3" aria-hidden="true" />
+          <X className="size-3.5" aria-hidden="true" />
         </button>
       )}
     </span>
@@ -94,7 +95,7 @@ export const Segmented = <T extends string>({
           type="button"
           aria-pressed={isActive}
           onClick={() => onChange(id)}
-          className={`rounded-[1px] px-2.5 text-label font-medium tracking-tight transition-colors duration-130 ${
+          className={`rounded-[1px] px-4 text-label font-medium tracking-tight transition-colors duration-130 ${
             isActive
               ? 'bg-raise text-ink shadow-[var(--elev-1)]'
               : 'text-faint hover:text-dim'

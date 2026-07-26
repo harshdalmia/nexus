@@ -22,14 +22,17 @@ export const CommandBar = () => {
   const totalNodes = scenario?.steps.length ?? 14;
 
   return (
-    <header className="hair-b relative flex h-16 shrink-0 items-center gap-4 bg-panel px-5 shadow-[var(--elev-1)]">
+    /* The investigation bar: title, live run, scope filters and the global
+       controls. It is the most-read strip in the product, so it gets real
+       height and real gutters instead of admin-dashboard density. */
+    <header className="hair-b relative flex h-20 shrink-0 items-center gap-6 bg-panel px-7 shadow-[var(--elev-1)]">
       <span
         aria-hidden="true"
         className="absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-info/45 via-transparent to-transparent"
       />
-      <div className="flex min-w-0 shrink-0 items-baseline gap-2.5">
+      <div className="flex min-w-0 shrink-0 items-baseline gap-3.5">
         <h1 className="display text-page leading-none tracking-[-0.035em]">{entry.title}</h1>
-        <p className="hidden truncate text-label tracking-tight text-faint xl:block">{entry.question}</p>
+        <p className="hidden truncate text-label tracking-tight text-faint 2xl:block">{entry.question}</p>
       </div>
 
       {isBusy && workspace !== 'ask' && (
@@ -38,7 +41,7 @@ export const CommandBar = () => {
           onClick={() => navigate('ask')}
           className="ctl ctl-primary anim-fade shrink-0 gap-1.5 text-xs2"
         >
-          <Loader2 className="size-3 animate-spin" aria-hidden="true" />
+          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
           investigating
           <span className="num">
             {(elapsedMs / 1000).toFixed(1)}s · {ranCount}/{totalNodes}
@@ -48,7 +51,7 @@ export const CommandBar = () => {
 
       {/* Scope rail: the chips here are the most-read controls in the product, so
           they get real horizontal room rather than the minimum. */}
-      <div className="hair-l flex min-w-0 flex-1 items-center gap-2.5 overflow-x-auto pl-5">
+      <div className="hair-l scroll flex min-w-0 flex-1 items-center gap-3.5 overflow-x-auto overflow-y-hidden pl-7">
         <span className="eyebrow shrink-0">scope</span>
         {scope.map((chip) => (
           <Chip
@@ -72,19 +75,19 @@ export const CommandBar = () => {
       </div>
 
       <button type="button" onClick={() => setPalette(true)} className="ctl shrink-0 gap-2 text-xs2">
-        <Command className="size-3" aria-hidden="true" />
+        <Command className="size-4" aria-hidden="true" />
         <span className="hidden text-faint sm:inline">ask or jump to…</span>
         <Kbd>⌘K</Kbd>
       </button>
 
-      <div className="hair-l flex shrink-0 items-center gap-1 pl-2">
+      <div className="hair-l flex shrink-0 items-center gap-2 pl-4">
         <button
           type="button"
           onClick={() => navigate('watchtower')}
           className="ctl ctl-danger gap-1.5 text-xs2"
           aria-label="2 cases breaching SLA — open Watchtower"
         >
-          <TriangleAlert className="size-3" aria-hidden="true" />
+          <TriangleAlert className="size-4" aria-hidden="true" />
           <span className="num">2 SLA</span>
         </button>
         <IconButton
@@ -102,7 +105,7 @@ export const CommandBar = () => {
           )}
         </IconButton>
         <span
-          className="ml-1 grid size-[26px] place-items-center rounded-[2px] border border-rule bg-sunken text-meta font-semibold tracking-wider text-dim shadow-[var(--elev-1)]"
+          className="ml-1.5 grid size-9 place-items-center rounded-[2px] border border-rule bg-sunken text-label font-semibold tracking-wider text-dim shadow-[var(--elev-1)]"
           title="Harsh R. · AML analyst L2"
         >
           HR

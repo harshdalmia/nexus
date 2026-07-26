@@ -33,7 +33,7 @@ export const Heatmap = ({ rows, columns, rowLabel, onCellSelect }: HeatmapProps)
   const peak = Math.max(...rows.flatMap((row) => row.values));
 
   return (
-    <div className="flex flex-col gap-1 px-3 py-2.5">
+    <div className="flex flex-col gap-1 px-4.5 py-3.5">
       <div className="flex items-center gap-[3px] pl-10">
         {columns.map((column) => (
           <span key={column} className="tick-label flex-1 text-center">

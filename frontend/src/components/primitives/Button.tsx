@@ -11,10 +11,12 @@ const variants: Record<Variant, string> = {
 };
 
 /* size only changes height and horizontal padding — never type size, so a
-   dense toolbar and a prominent action still read as the same family */
+   dense toolbar and a prominent action still read as the same family.
+   `xs` was a 21px target, which is below any sane minimum for a control that
+   commits an action; it is now 28px with real gutters. */
 const sizes: Record<Size, string> = {
-  xs: 'h-[21px] px-1.5 text-meta gap-1',
-  sm: 'px-2 text-xs2',
+  xs: 'h-7 px-2.5 text-meta gap-1.5',
+  sm: 'px-3.5 text-xs2',
 };
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -65,7 +67,7 @@ export const IconButton = ({
 
 /* keycaps: printed, slightly recessed, mono */
 export const Kbd = ({ children }: { readonly children: ReactNode }) => (
-  <kbd className="inline-flex h-[15px] min-w-[15px] items-center justify-center rounded-[2px] border border-rule bg-sunken px-1 text-meta leading-none font-medium text-faint shadow-[inset_0_-1px_0_0_var(--s-rule)]">
+  <kbd className="inline-flex h-[18px] min-w-[18px] items-center justify-center rounded-[2px] border border-rule bg-sunken px-1.5 text-meta leading-none font-medium text-faint shadow-[inset_0_-1px_0_0_var(--s-rule)]">
     {children}
   </kbd>
 );

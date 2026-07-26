@@ -113,7 +113,7 @@ export const ReportsWorkspace = () => {
     return (
       <Panel className="border-0">
         <PanelHead title="report composer" meta={loading ? 'loading the draft' : 'unavailable'} />
-        <div className="px-5 py-4">
+        <div className="px-7 py-5">
           {error === null ? <SkeletonLines lines={6} /> : <p className="text-label text-rev">{error}</p>}
         </div>
       </Panel>
@@ -139,10 +139,10 @@ export const ReportsWorkspace = () => {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col xl:flex-row">
-      <Panel className="hair-r min-h-0 w-full shrink-0 border-0 xl:w-[19rem]">
+      <Panel collapseId="reports.spine" className="hair-r min-h-0 w-full shrink-0 border-0 xl:w-[20rem] 2xl:w-[23rem]">
         <PanelHead title="evidence spine" meta={`${String(items.length)} pinned by you`} />
         {items.length === 0 ? (
-          <p className="px-4 py-3 text-label leading-relaxed text-muted">
+          <p className="px-6 py-4.5 text-label leading-relaxed text-muted">
             Nothing pinned. The draft on the right is built from the run&apos;s evidence
             regardless; pinning is for the items you want to argue from.
           </p>
@@ -151,7 +151,7 @@ export const ReportsWorkspace = () => {
             {items.map((item, index) => (
               <li
                 key={item.id}
-                className="hair-b flex items-start gap-2 px-4 py-3"
+                className="hair-b flex items-start gap-2 px-6 py-4.5"
               >
                 <span className="num mt-px w-4 shrink-0 text-meta text-faint">{index + 1}</span>
                 <span className="min-w-0 flex-1">
@@ -163,13 +163,13 @@ export const ReportsWorkspace = () => {
             ))}
           </ol>
         )}
-        <footer className="hair-t px-4 py-2.5 text-meta leading-relaxed text-faint">
+        <footer className="hair-t px-6 py-4 text-meta leading-relaxed text-faint">
           The engine cites its own sources under each paragraph. Nothing enters the draft
           without one.
         </footer>
       </Panel>
 
-      <Panel className="min-h-0 flex-1 border-0">
+      <Panel collapseId="reports.composer" className="min-h-0 flex-1 border-0">
         <PanelHead
           title="draft report"
           meta={
@@ -212,7 +212,7 @@ export const ReportsWorkspace = () => {
               ['risk', `${String(report.risk)} / 100 · ${report.tier ?? '—'}`],
               ['recommended', report.escalation ?? '—'],
             ].map(([label, value]) => (
-              <div key={label} className="hair-r px-4 py-3 last:border-r-0">
+              <div key={label} className="hair-r px-6 py-4.5 last:border-r-0">
                 <dt className="eyebrow">{label}</dt>
                 <dd className="num truncate text-label text-ink">{value}</dd>
               </div>
@@ -222,9 +222,9 @@ export const ReportsWorkspace = () => {
           {report.sections.map((section) => (
             <article
               key={section.heading}
-              className="hair-b border-l-2 border-l-transparent px-4 py-3.5"
+              className="hair-b border-l-2 border-l-transparent px-6 py-5"
             >
-              <h3 className="eyebrow pb-1.5">{section.heading}</h3>
+              <h3 className="eyebrow pb-2.5">{section.heading}</h3>
               <p className="max-w-[86ch] text-read whitespace-pre-line text-ink">{section.body}</p>
 
               {section.sources.length > 0 && (
@@ -251,7 +251,7 @@ export const ReportsWorkspace = () => {
             </article>
           ))}
 
-          <div className="flex items-start gap-3 px-5 py-4">
+          <div className="flex items-start gap-3 px-7 py-5">
             <ShieldCheck className="mt-0.5 size-4 shrink-0 text-faint" aria-hidden="true" />
             <div className="max-w-[86ch] text-label leading-relaxed text-faint">
               {report.notes.map((note) => (
@@ -263,13 +263,13 @@ export const ReportsWorkspace = () => {
         </div>
       </Panel>
 
-      <Panel className="hair-l min-h-0 w-full shrink-0 border-0 xl:w-[20rem]">
+      <Panel collapseId="reports.sources" className="hair-l min-h-0 w-full shrink-0 border-0 xl:w-[21rem] 2xl:w-[24rem]">
         <PanelHead
           title="filing readiness"
           meta={`${String(satisfied)} of ${String(report.readiness.length)} satisfied`}
         />
         <div className="scroll min-h-0 flex-1">
-          <div className="hair-b px-4 py-3.5">
+          <div className="hair-b px-6 py-5">
             <div className="flex h-1 overflow-hidden bg-raise">
               <span
                 className="bg-rev transition-[width] duration-300"
@@ -288,7 +288,7 @@ export const ReportsWorkspace = () => {
 
           <ul className="flex flex-col">
             {report.readiness.map((item) => (
-              <li key={item.id} className="hair-b flex items-start gap-2 px-4 py-2.5">
+              <li key={item.id} className="hair-b flex items-start gap-2 px-6 py-4">
                 {statusIcon(item.status)}
                 <span className="min-w-0 flex-1">
                   <span
@@ -306,8 +306,8 @@ export const ReportsWorkspace = () => {
             ))}
           </ul>
 
-          <div className="px-4 py-3.5">
-            <p className="eyebrow pb-1.5">artefacts</p>
+          <div className="px-6 py-5">
+            <p className="eyebrow pb-2.5">artefacts</p>
             {report.artifacts.length === 0 ? (
               <p className="text-label leading-relaxed text-muted">
                 No artefact has been rendered for this run yet. Use “rebuild package”.
@@ -317,7 +317,7 @@ export const ReportsWorkspace = () => {
                 {report.artifacts.map((artifact: ArtifactDto) => (
                   <li
                     key={artifact.name}
-                    className="flex items-center gap-2 rounded-[2px] border border-line bg-raise px-3 py-2.5 shadow-[var(--elev-1)]"
+                    className="flex items-center gap-2 rounded-[2px] border border-line bg-raise px-4.5 py-3.5 shadow-[var(--elev-1)]"
                   >
                     <Download className="size-3 shrink-0 text-info" aria-hidden="true" />
                     <a

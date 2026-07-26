@@ -87,7 +87,7 @@ export const WatchtowerWorkspace = () => {
       <div className="flex min-h-0 flex-1 flex-col">
         <AlertQueue />
         <div className="flex min-h-0 flex-[2] flex-col xl:flex-row">
-          <Panel className="hair-r min-h-0 flex-1 border-0">
+          <Panel collapseId="watchtower.board" className="hair-r min-h-0 flex-1 border-0">
             <PanelHead
               title="corridor exposure"
               meta={
@@ -115,7 +115,7 @@ export const WatchtowerWorkspace = () => {
             )}
           </Panel>
 
-          <Panel className="min-h-0 w-full shrink-0 border-0 xl:w-[27rem]">
+          <Panel collapseId="watchtower.context" className="min-h-0 w-full shrink-0 border-0 xl:w-[28rem] 2xl:w-[32rem]">
             <PanelHead
               title={distributions === null ? 'typology mix' : 'amount bands'}
               meta={

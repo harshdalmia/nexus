@@ -18,7 +18,7 @@ export const CaseIndex = () => {
   const live = cases.length > 0;
 
   return (
-    <Panel className="hair-r min-h-0 w-full shrink-0 border-0 lg:w-[15.5rem]">
+    <Panel collapseId="cases.index" className="hair-r min-h-0 w-full shrink-0 border-0 lg:w-[16.5rem] 2xl:w-[19rem]">
       <PanelHead
         title="cases"
         meta={
@@ -42,7 +42,7 @@ export const CaseIndex = () => {
                   selectEntity(record.entity);
                 }}
                 aria-current={isActive ? 'true' : undefined}
-                className={`relative flex w-full flex-col gap-1 px-4 py-3 text-left transition-colors duration-100 ${
+                className={`relative flex w-full flex-col gap-1 px-6 py-4.5 text-left transition-colors duration-100 ${
                   isActive ? 'bg-sel' : 'hover:bg-raise'
                 } hair-b`}
               >

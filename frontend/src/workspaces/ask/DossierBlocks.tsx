@@ -31,7 +31,7 @@ export const SummaryBlock = ({ scenario }: { readonly scenario: Scenario }) => {
   return (
     <div className="grid gap-0 lg:grid-cols-[minmax(0,14rem)_minmax(0,1fr)]">
       <div
-        className={`hair-r flex flex-col justify-center px-4 py-4 ${
+        className={`hair-r flex flex-col justify-center px-6 py-5 ${
           metric.severity === 'severe'
             ? 'bg-sev-bg/30'
             : metric.severity === 'review'
@@ -39,7 +39,7 @@ export const SummaryBlock = ({ scenario }: { readonly scenario: Scenario }) => {
               : 'bg-raise/40'
         }`}
       >
-        <p className="eyebrow pb-1">{metric.label}</p>
+        <p className="eyebrow pb-2">{metric.label}</p>
         <p
           className={`metric text-display ${
             metric.severity === 'severe' ? 'text-sev' : metric.severity === 'review' ? 'text-rev' : 'text-ink'
@@ -53,7 +53,7 @@ export const SummaryBlock = ({ scenario }: { readonly scenario: Scenario }) => {
         </p>
       </div>
 
-      <div className="flex flex-col gap-3 px-4 py-4">
+      <div className="flex flex-col gap-3 px-6 py-5">
         <p className="max-w-[64ch] text-section leading-tight text-ink">{scenario.resultHeadline}</p>
         <p className="max-w-[86ch] text-label leading-relaxed text-muted">
           Answering “{query}”. {scenario.plannerNote}
@@ -155,17 +155,17 @@ export const EvidenceBlock = ({ scenario }: { readonly scenario: Scenario }) => 
       renderPeek={(row) => (
         <div className="flex flex-wrap items-start gap-x-8 gap-y-2">
           <div>
-            <p className="eyebrow pb-1">pattern</p>
+            <p className="eyebrow pb-2">pattern</p>
             <p className="text-label text-muted">{row.pattern}</p>
           </div>
           <div>
-            <p className="eyebrow pb-1">measures</p>
+            <p className="eyebrow pb-2">measures</p>
             <p className="num text-label text-muted">
               {row.primary} · {row.secondary}
             </p>
           </div>
           <div>
-            <p className="eyebrow pb-1">disposition</p>
+            <p className="eyebrow pb-2">disposition</p>
             <p className="text-label text-muted">
               {row.score >= 75
                 ? 'report — multiple rules concur'
@@ -286,7 +286,7 @@ export const TimelineBlock = () => {
   const lanes = ['deposit', 'wire', 'alert', 'model', 'account', 'note', 'sar'] as const;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-2 px-4 py-3.5">
+    <div className="flex min-h-0 flex-1 flex-col gap-2 px-6 py-5">
       <div className="flex flex-col gap-[3px]">
         {lanes.map((lane) => {
           const events = caseTimeline.filter((event) => event.kind === lane);
@@ -326,7 +326,7 @@ export const TimelineBlock = () => {
         ))}
       </div>
 
-      <article className="mt-auto flex flex-wrap items-start gap-3 rounded-[2px] border border-line bg-raise px-4 py-3 shadow-[var(--elev-1)]">
+      <article className="mt-auto flex flex-wrap items-start gap-3 rounded-[2px] border border-line bg-raise px-6 py-4.5 shadow-[var(--elev-1)]">
         <div className="min-w-[16rem] flex-1">
           <p className="flex items-baseline gap-2">
             <span className="num text-meta text-faint">day {selected.day}</span>
@@ -371,7 +371,7 @@ export const SarBlock = () => {
 
   if (report === null) {
     return (
-      <div className="flex min-h-0 flex-1 flex-col justify-between px-4 py-3.5">
+      <div className="flex min-h-0 flex-1 flex-col justify-between px-6 py-5">
         <p className="max-w-[92ch] text-label leading-relaxed text-muted">
           {loading ? 'Assembling the draft from this run…' : reason}
         </p>
@@ -387,7 +387,7 @@ export const SarBlock = () => {
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="scroll min-h-0 flex-1 px-4 py-3.5">
+      <div className="scroll min-h-0 flex-1 px-6 py-5">
         <div className="flex flex-wrap items-center gap-2 pb-2">
           <Tone kind="neutral">draft · unfiled</Tone>
           <span className="num text-meta text-faint">
@@ -397,7 +397,7 @@ export const SarBlock = () => {
         </div>
         {report.sections.slice(0, 3).map((section) => (
           <div key={section.heading} className="pb-2.5">
-            <p className="eyebrow pb-1">{section.heading}</p>
+            <p className="eyebrow pb-2">{section.heading}</p>
             <p className="max-w-[92ch] text-read whitespace-pre-line text-ink">{section.body}</p>
           </div>
         ))}
@@ -408,7 +408,7 @@ export const SarBlock = () => {
           </p>
         )}
       </div>
-      <div className="hair-t flex flex-wrap items-center gap-1.5 px-4 py-3">
+      <div className="hair-t flex flex-wrap items-center gap-1.5 px-6 py-4.5">
         <Button size="xs" variant="quiet" onClick={() => navigate('reports')}>
           <FileSignature className="size-3" aria-hidden="true" />
           open composer
@@ -442,7 +442,7 @@ export const DownloadsBlock = () => {
 
   if (report === null || report.artifacts.length === 0) {
     return (
-      <div className="flex min-h-0 flex-1 items-start px-4 py-3.5">
+      <div className="flex min-h-0 flex-1 items-start px-6 py-5">
         <p className="max-w-[92ch] text-label leading-relaxed text-muted">
           {loading ? 'Rendering artefacts…' : report === null ? reason : 'This run produced no artefacts.'}
         </p>
@@ -451,7 +451,7 @@ export const DownloadsBlock = () => {
   }
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-2 px-4 py-3.5">
+    <div className="flex min-h-0 flex-1 flex-col gap-2 px-6 py-5">
       {report.artifacts.map((artifact) => (
         <a
           key={artifact.name}
@@ -468,7 +468,7 @@ export const DownloadsBlock = () => {
               metadata: { artefact: artifact.name, sha256: artifact.sha256 },
             });
           }}
-          className="group flex items-center gap-2 rounded-[2px] border border-line bg-raise px-3 py-2.5 text-left shadow-[var(--elev-1)] transition-colors hover:border-info-line hover:bg-info-bg/40"
+          className="group flex items-center gap-2 rounded-[2px] border border-line bg-raise px-4.5 py-3.5 text-left shadow-[var(--elev-1)] transition-colors hover:border-info-line hover:bg-info-bg/40"
         >
           <Download className="size-3 shrink-0 text-faint group-hover:text-info" aria-hidden="true" />
           <span className="num min-w-0 flex-1 truncate text-label text-ink">{artifact.name}</span>

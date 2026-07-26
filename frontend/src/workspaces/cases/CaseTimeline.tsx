@@ -230,7 +230,7 @@ export const CaseTimeline = () => {
   };
 
   return (
-    <Panel className="min-h-0 flex-1 border-0">
+    <Panel collapseId="cases.timeline" className="min-h-0 flex-1 border-0">
       <PanelHead
         title="evidence timeline"
         meta={
@@ -241,6 +241,11 @@ export const CaseTimeline = () => {
               : error !== null
                 ? `engine timeline unavailable (${error}) — showing the demo case`
                 : `demo case · day 1 → ${String(days)}`}
+          </span>
+        }
+        summary={
+          <span className="truncate text-label text-faint">
+            folded · {String(events.length)} events over {String(days)} days
           </span>
         }
         actions={
@@ -257,7 +262,7 @@ export const CaseTimeline = () => {
         }
       />
 
-      <div className="min-h-0 flex-1 overflow-hidden px-4 py-3">
+      <div className="min-h-0 flex-1 overflow-hidden px-6 py-4.5">
         <div className="relative">
           <div className="flex flex-col gap-[3px]">
             {lanes.map((lane) => (
@@ -311,7 +316,7 @@ export const CaseTimeline = () => {
           <span className="num w-14 shrink-0 text-right text-meta text-info">day {cursor}</span>
         </div>
 
-        <article className="mt-2 flex flex-wrap items-start gap-3 rounded-[2px] border border-line bg-raise px-4 py-3 shadow-[var(--elev-1)]">
+        <article className="mt-2 flex flex-wrap items-start gap-3 rounded-[2px] border border-line bg-raise px-6 py-4.5 shadow-[var(--elev-1)]">
           {(() => {
             const Icon = kindIcon[selected.kind];
 

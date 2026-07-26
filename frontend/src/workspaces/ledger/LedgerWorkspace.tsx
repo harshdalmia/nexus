@@ -7,17 +7,19 @@ import {
   Pin,
   RotateCcw,
   SearchX,
+  SlidersHorizontal,
 } from 'lucide-react';
 import { Button } from '@/components/primitives/Button';
 import { Chip, Segmented } from '@/components/primitives/Chip';
 import { DataTable } from '@/components/primitives/DataTable';
 import type { Column } from '@/components/primitives/DataTable';
 import { EmptyState } from '@/components/primitives/EmptyState';
-import { Panel, PanelHead } from '@/components/primitives/Panel';
+import { Collapse, Panel, PanelHead } from '@/components/primitives/Panel';
 import { ScoreValue, SeverityTag, Tone } from '@/components/primitives/Severity';
 import { channelLabel, ledgerRows, savedViews } from '@/data/ledger';
 import type { LedgerRow } from '@/data/ledger';
 import { useEngineHealth } from '@/hooks/useEngineHealth';
+import { useCollapsed } from '@/hooks/useCollapsed';
 import { useSessionState } from '@/hooks/useSessionState';
 import { ApiError } from '@/lib/api/client';
 import { api } from '@/lib/api';
@@ -231,8 +233,8 @@ const FilterField = ({
   readonly hint?: string;
   readonly children: React.ReactNode;
 }) => (
-  <label className="flex min-w-0 flex-col gap-1.5">
-    <span className="eyebrow flex items-baseline gap-1.5">
+  <label className="flex min-w-0 flex-col gap-2.5">
+    <span className="eyebrow flex items-baseline gap-2">
       {label}
       {hint !== undefined && <span className="text-meta normal-case text-ghost">{hint}</span>}
     </span>
@@ -240,8 +242,10 @@ const FilterField = ({
   </label>
 );
 
+/* Filter controls carry the same height as every other control and enough width
+   that a currency or a channel name is never clipped. */
 const selectClass =
-  'h-[var(--control-h)] min-w-[10rem] rounded-[2px] border border-rule bg-raise px-2.5 text-body ' +
+  'h-[var(--control-h)] min-w-[13rem] rounded-[2px] border border-rule bg-raise px-3.5 text-body ' +
   'text-ink shadow-[var(--elev-1)] transition-colors hover:border-edge focus:border-info-line ' +
   'focus:outline-none';
 
@@ -258,7 +262,7 @@ const Toggle = ({
     type="button"
     aria-pressed={active}
     onClick={() => onChange(!active)}
-    className={`inline-flex h-[var(--control-h)] items-center gap-2 rounded-[2px] border px-3 text-body transition-colors ${
+    className={`inline-flex h-[var(--control-h)] items-center gap-2.5 rounded-[2px] border px-4 text-body transition-colors ${
       active
         ? 'border-info-line bg-info-bg text-info'
         : 'border-rule bg-raise text-muted hover:border-edge hover:text-ink'
@@ -273,6 +277,7 @@ const Toggle = ({
 );
 
 export const LedgerWorkspace = () => {
+  const { shut: filtersShut, toggle: toggleFilters } = useCollapsed('ledger.filters');
   const { activeCaseId, scope } = useWorkspaceState();
   const { pin, notify, selectEntity, navigate } = useWorkspaceActions();
   const { record } = useAudit();
@@ -763,6 +768,18 @@ export const LedgerWorkspace = () => {
           }
           actions={
             <>
+              {/* Fold the filter bar and the measures away when the table itself
+                  is the thing being read. Nothing is discarded: the filters stay
+                  applied and the controls stay mounted. */}
+              <Button
+                size="xs"
+                variant="ghost"
+                aria-expanded={!filtersShut}
+                onClick={toggleFilters}
+              >
+                <SlidersHorizontal className="size-3.5" aria-hidden="true" />
+                {filtersShut ? `show filters · ${String(chips.length)} active` : 'hide filters'}
+              </Button>
               {live && (
                 <span className="flex items-center gap-1.5">
                   <Button
@@ -809,9 +826,12 @@ export const LedgerWorkspace = () => {
           }
         />
 
-        {/* ---------- filter bar ---------- */}
-        <div className="hair-b flex flex-col gap-4 px-6 py-4">
-          <div className="flex flex-wrap items-end gap-x-7 gap-y-4">
+        {/* ---------- filter bar ----------
+            Enterprise analytics proportions: a tall bar, wide gutters between
+            every control, and labels that sit clear of their field. */}
+        <Collapse shut={filtersShut}>
+        <div className="hair-b flex flex-col gap-7 px-8 py-7">
+          <div className="filterbar">
             <FilterField label="amount band" hint="base currency">
               <Segmented
                 label="Amount band"
@@ -902,7 +922,7 @@ export const LedgerWorkspace = () => {
               />
             </FilterField>
 
-            <div className="flex items-end gap-2 pb-px">
+            <div className="flex items-end gap-3 pb-px">
               <Toggle
                 label={live ? 'labelled only' : 'severe only'}
                 active={filters.labelledOnly}
@@ -927,7 +947,7 @@ export const LedgerWorkspace = () => {
           </div>
 
           {/* ---------- active filters + scope ---------- */}
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-3">
             <span className="eyebrow flex shrink-0 items-center gap-1.5">
               <Filter className="size-3.5" aria-hidden="true" />
               active · {chips.length}
@@ -995,22 +1015,22 @@ export const LedgerWorkspace = () => {
         </div>
 
         {/* ---------- measures ---------- */}
-        <div className="hair-b flex flex-wrap items-end gap-x-10 gap-y-3 px-6 py-3.5">
+        <div className="hair-b flex flex-wrap items-end gap-x-12 gap-y-5 px-8 py-6">
           <div>
-            <p className="eyebrow pb-0.5">rows in view</p>
+            <p className="eyebrow pb-1.5">rows in view</p>
             <p className="metric text-metric leading-none text-ink">{num(rows.length)}</p>
           </div>
           <div>
-            <p className="eyebrow pb-0.5">value in view</p>
+            <p className="eyebrow pb-1.5">value in view</p>
             <p className="metric text-metric leading-none text-ink">{money(inView)}</p>
           </div>
           <div>
-            <p className="eyebrow pb-0.5">matching filters</p>
+            <p className="eyebrow pb-1.5">matching filters</p>
             <p className="metric text-metric leading-none text-info">{matching}</p>
           </div>
           {filters.amount !== 'any' && (
             <div>
-              <p className="eyebrow pb-0.5">threshold band</p>
+              <p className="eyebrow pb-1.5">threshold band</p>
               <p className="num text-body-lg leading-none text-rev">
                 {AMOUNT_LABEL[filters.amount]}
               </p>
@@ -1026,6 +1046,7 @@ export const LedgerWorkspace = () => {
                 : 'Bundled demo rows carry scores, so every filter including the risk band applies.'}
           </p>
         </div>
+        </Collapse>
 
         <DataTable
           rows={rows}
@@ -1066,9 +1087,9 @@ export const LedgerWorkspace = () => {
             />
           }
           renderPeek={(row) => (
-            <div className="flex flex-wrap items-start gap-x-10 gap-y-3">
+            <div className="flex flex-wrap items-start gap-x-12 gap-y-6">
               <div>
-                <p className="eyebrow pb-1">rule</p>
+                <p className="eyebrow pb-2">rule</p>
                 <p className="num text-body text-ink">
                   {row.citations !== null && row.citations.length > 0
                     ? `cited by ${String(row.citations.length)} claim${
@@ -1079,7 +1100,7 @@ export const LedgerWorkspace = () => {
               </div>
               {row.citations !== null && row.citations.length > 0 ? (
                 <div className="min-w-[34rem] max-w-[64ch] basis-full">
-                  <p className="eyebrow pb-1">claims citing this transaction</p>
+                  <p className="eyebrow pb-2">claims citing this transaction</p>
                   <ul className="flex flex-col gap-1">
                     {row.citations.map((citation) => (
                       <li key={citation.claim_id} className="flex flex-wrap items-baseline gap-2">
@@ -1104,18 +1125,18 @@ export const LedgerWorkspace = () => {
                 </div>
               ) : (
                 <div>
-                  <p className="eyebrow pb-1">shap drivers</p>
+                  <p className="eyebrow pb-2">shap drivers</p>
                   <p className="num text-body text-muted">
                     {row.shap === null ? 'account-level only' : row.shap.join(' · ')}
                   </p>
                 </div>
               )}
               <div>
-                <p className="eyebrow pb-1">pattern</p>
+                <p className="eyebrow pb-2">pattern</p>
                 <p className="text-body text-muted">{row.pattern ?? '—'}</p>
               </div>
               <div>
-                <p className="eyebrow pb-1">
+                <p className="eyebrow pb-2">
                   {row.accountRisk === null ? 'sibling transactions' : 'account risk'}
                 </p>
                 <p className="num text-body text-muted">

@@ -31,16 +31,18 @@ export const AskWorkspace = () => {
     <div className="flex min-h-0 flex-1 flex-col">
       <QueryConsole />
 
-      {staged ? (
-        <ExecutionStage />
-      ) : (
-        <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
-          <PlanRail />
-          <div className="flex min-h-0 flex-1 flex-col">
-            <Dossier />
-          </div>
+      {staged && <ExecutionStage />}
+
+      {/* The dossier layout stays MOUNTED behind full canvas rather than being
+          swapped out. Entering and leaving the stage therefore costs nothing:
+          folded sections, chart selections, table pages and scroll offsets are
+          all still there when the analyst comes back. */}
+      <div className={`flex min-h-0 flex-1 flex-col lg:flex-row ${staged ? 'hidden' : ''}`}>
+        <PlanRail />
+        <div className="flex min-h-0 flex-1 flex-col">
+          <Dossier />
         </div>
-      )}
+      </div>
     </div>
   );
 };

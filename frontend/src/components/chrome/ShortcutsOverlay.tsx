@@ -68,7 +68,7 @@ export const ShortcutsOverlay = () => {
         className="anim-scale-in overlay-shadow w-[min(760px,94vw)] border border-edge bg-panel"
         onClick={(event) => event.stopPropagation()}
       >
-        <header className="flex items-center gap-3 border-b border-line px-4 py-2.5">
+        <header className="flex items-center gap-4 border-b border-line px-6 py-4">
           <h2 className="text-dense font-semibold">Keyboard map</h2>
           <p className="text-2xs text-faint">
             The whole triage loop is reachable without a mouse. Peek, then commit.
@@ -82,10 +82,10 @@ export const ShortcutsOverlay = () => {
           </button>
         </header>
 
-        <div className="grid gap-x-8 gap-y-4 p-4 sm:grid-cols-2">
+        <div className="grid gap-x-10 gap-y-5 p-6 sm:grid-cols-2">
           {groups.map((group) => (
             <section key={group.title}>
-              <p className="eyebrow pb-1.5">{group.title}</p>
+              <p className="eyebrow pb-2.5">{group.title}</p>
               <ul className="flex flex-col gap-1">
                 {group.items.map((item) => (
                   <li key={item.label} className="flex items-center gap-2">

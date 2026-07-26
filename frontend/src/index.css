@@ -78,29 +78,29 @@
      ------------------------------------------------------------------ */
 
   /* secondary metadata, timestamps, ticks, provenance */
-  --text-meta: 0.8125rem; /* 13 */
-  --text-meta--line-height: 1.25rem;
+  --text-meta: 0.875rem; /* 14 */
+  --text-meta--line-height: 1.375rem;
   /* labels, eyebrows, chips, keycaps */
-  --text-label: 0.875rem; /* 14 */
-  --text-label--line-height: 1.375rem;
+  --text-label: 0.9375rem; /* 15 */
+  --text-label--line-height: 1.5rem;
   /* table content, navigation, controls, dense body */
-  --text-body: 0.9375rem; /* 15 */
-  --text-body--line-height: 1.5rem;
+  --text-body: 1rem; /* 16 */
+  --text-body--line-height: 1.625rem;
   /* emphasised body, entity ids, values in tables */
-  --text-body-lg: 1rem; /* 16 */
-  --text-body-lg--line-height: 1.625rem;
+  --text-body-lg: 1.0625rem; /* 17 */
+  --text-body-lg--line-height: 1.75rem;
   /* narrative prose — AI explanations, SAR paragraphs */
-  --text-read: 1.0625rem; /* 17 */
-  --text-read--line-height: 1.8125rem;
+  --text-read: 1.125rem; /* 18 */
+  --text-read--line-height: 1.9375rem;
   /* card and panel titles */
-  --text-card: 1.1875rem; /* 19 */
-  --text-card--line-height: 1.625rem;
+  --text-card: 1.25rem; /* 20 */
+  --text-card--line-height: 1.75rem;
   /* section titles */
-  --text-section: 1.5rem; /* 24 */
-  --text-section--line-height: 1.875rem;
+  --text-section: 1.625rem; /* 26 */
+  --text-section--line-height: 2.0625rem;
   /* page / workspace titles */
-  --text-page: 2.125rem; /* 34 */
-  --text-page--line-height: 2.375rem;
+  --text-page: 2.25rem; /* 36 */
+  --text-page--line-height: 2.5rem;
 
   /* metric roles, smallest → largest */
   --text-metric: 2rem; /* 32 — inline metrics, KPI chips */
@@ -115,15 +115,15 @@
   /* legacy aliases kept so no component keeps a hardcoded size; every one
      now resolves into the roles above */
   --text-2xs: var(--text-meta);
-  --text-2xs--line-height: 1.25rem;
+  --text-2xs--line-height: 1.375rem;
   --text-xs2: var(--text-label);
-  --text-xs2--line-height: 1.375rem;
+  --text-xs2--line-height: 1.5rem;
   --text-dense: var(--text-body);
-  --text-dense--line-height: 1.5rem;
+  --text-dense--line-height: 1.625rem;
   --text-lede: var(--text-read);
-  --text-lede--line-height: 1.8125rem;
+  --text-lede--line-height: 1.9375rem;
   --text-title: var(--text-section);
-  --text-title--line-height: 1.875rem;
+  --text-title--line-height: 2.0625rem;
 
   --ease-out-quint: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-in-out-quart: cubic-bezier(0.76, 0, 0.24, 1);
@@ -241,25 +241,37 @@
 }
 
 /* ------------------------------------------------------------- density ----
-   Both modes are now comfortable. "Compact" is the working default at 44px
-   rows; "relaxed" is for long review sessions and projection. Density trades
-   rows-on-screen, never legibility. */
+   Both modes are comfortable. "Compact" is the working default at 48px rows;
+   "relaxed" is for long review sessions and projection. Density trades
+   rows-on-screen, never legibility.
+
+   These tokens are the spacing spine: panel padding, header height, cell
+   gutters, row height and control height all read from here, so raising a
+   value here loosens the whole product at once instead of file by file.
+   `--sec-x` / `--sec-y` are the standard inset for a block inside a panel
+   body, and `--grid-gap` the standard gap between sibling cards. */
 [data-density='compact'] {
-  --row-h: 44px;
-  --cell-x: 0.875rem;
-  --pad-y: 0.5rem;
-  --panel-head-h: 48px;
-  --panel-x: 1rem;
-  --control-h: 32px;
+  --row-h: 48px;
+  --cell-x: 1.125rem;
+  --pad-y: 0.625rem;
+  --panel-head-h: 56px;
+  --panel-x: 1.375rem;
+  --control-h: 36px;
+  --sec-x: 1.375rem;
+  --sec-y: 1.125rem;
+  --grid-gap: 1.25rem;
 }
 
 [data-density='relaxed'] {
-  --row-h: 52px;
-  --cell-x: 1.125rem;
-  --pad-y: 0.75rem;
-  --panel-head-h: 56px;
-  --panel-x: 1.25rem;
-  --control-h: 36px;
+  --row-h: 58px;
+  --cell-x: 1.375rem;
+  --pad-y: 0.875rem;
+  --panel-head-h: 64px;
+  --panel-x: 1.75rem;
+  --control-h: 40px;
+  --sec-x: 1.75rem;
+  --sec-y: 1.375rem;
+  --grid-gap: 1.625rem;
 }
 
 @layer base {
@@ -295,10 +307,19 @@
     color: var(--t-ink);
   }
 
+  /* Focus is a keyboard-only affordance here, so it can afford to be loud:
+     a 2px ring plus a soft halo reads on every surface in both themes. */
   :focus-visible {
-    outline: 1.5px solid var(--f-info);
-    outline-offset: 1px;
+    outline: 2px solid var(--f-info);
+    outline-offset: 2px;
     border-radius: 2px;
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--f-info) 16%, transparent);
+  }
+
+  /* Interactive text and icon buttons keep a minimum comfortable hit area
+     without changing where they sit in a row. */
+  button:not(:disabled) {
+    cursor: pointer;
   }
 
   button,
@@ -340,7 +361,7 @@
     position: relative;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 1.125rem;
     height: var(--panel-head-h);
     padding: 0 var(--panel-x);
     border-bottom: 1px solid var(--s-rule);
@@ -361,6 +382,94 @@
       color-mix(in oklab, var(--f-info) 55%, transparent),
       transparent 22%
     );
+  }
+
+  /* ---- collapsible panels ----
+     The body stays mounted when a panel is shut, so nothing is unloaded and no
+     scroll position, table page or expanded row is lost.
+
+     `display: contents` is load-bearing, not a flourish. Panel bodies size
+     themselves with `flex-1` (flex-basis 0) against the panel's height, so an
+     extra layout box between the panel and its body collapses them to zero —
+     the wrapper's own height would come from content, and content that is
+     flex-basis 0 contributes nothing. A `contents` wrapper adds no box at all,
+     so an open panel lays out exactly as it did before it became collapsible. */
+  .panel-open {
+    display: contents;
+  }
+
+  .panel-shut {
+    display: none;
+  }
+
+  /* Going from display:none to displayed restarts CSS animations, which is how
+     the body eases back in on expand without a height transition (heights here
+     are flex-derived and not animatable). */
+  .panel-open > * {
+    animation: fade-in 200ms var(--ease-out-quint) both;
+  }
+
+  /* A shut panel must stop claiming its share of the column so its siblings
+     take the freed space. Done here rather than with a utility class because a
+     panel's own `flex-1` would otherwise win by stylesheet order. */
+  [data-collapsed='true'] {
+    flex: none !important;
+  }
+
+  /* the chevron affordance in a panel header */
+  .collapse-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    margin-inline-start: -0.375rem;
+    border-radius: 2px;
+    color: var(--t-faint);
+    transition:
+      background 130ms var(--ease-out-quint),
+      color 130ms var(--ease-out-quint);
+  }
+
+  .collapse-toggle:hover {
+    background: var(--s-raise);
+    color: var(--t-ink);
+  }
+
+  .collapse-toggle > svg {
+    transition: transform 200ms var(--ease-out-quint);
+  }
+
+  .collapse-toggle[aria-expanded='false'] > svg {
+    transform: rotate(-90deg);
+  }
+
+  /* ---- standard insets ----
+     `sec` is one logical block inside a panel body; `sec-grid` the gap between
+     sibling cards. Both read the density tokens so spacing stays consistent
+     instead of being re-guessed per file. */
+  .sec {
+    padding: var(--sec-y) var(--sec-x);
+  }
+
+  .sec-grid {
+    gap: var(--grid-gap);
+  }
+
+  /* ---- filter bars ----
+     Read constantly and clicked constantly, so they get real height, real
+     gutters and room between every control rather than the minimum. */
+  .filterbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    column-gap: 2.75rem;
+    row-gap: 1.5rem;
+  }
+
+  /* every field in a filter bar shares one label rhythm */
+  .filterbar label > .eyebrow {
+    padding-bottom: 0.125rem;
   }
 
   .sheen {
@@ -478,7 +587,7 @@
     justify-content: center;
     gap: 0.5rem;
     height: var(--control-h);
-    padding: 0 0.75rem;
+    padding: 0 0.9375rem;
     border: 1px solid var(--s-rule);
     border-radius: 2px;
     background: var(--ctl-bg);
@@ -497,6 +606,11 @@
   .ctl:hover:not(:disabled) {
     border-color: var(--s-edge);
     color: var(--t-ink);
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklab, var(--s-raise) 88%, var(--t-ink) 6%),
+      var(--s-raise)
+    );
   }
 
   .ctl:active:not(:disabled) {
@@ -546,7 +660,7 @@
   /* inputs: recessed wells, not floating boxes */
   .field {
     height: var(--control-h);
-    padding: 0 0.75rem;
+    padding: 0 0.875rem;
     font-size: var(--text-body);
     border: 1px solid var(--s-rule);
     border-radius: 2px;
@@ -560,6 +674,27 @@
 
   .field::placeholder {
     color: var(--t-ghost);
+  }
+
+  .field:hover:not(:disabled):not(:focus) {
+    border-color: var(--s-edge);
+  }
+
+  .field:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  /* native selects used as filters: same well, room for the caret, and a
+     readable option list in both themes */
+  select.field {
+    padding-inline-end: 0.5rem;
+    cursor: pointer;
+  }
+
+  select.field > option {
+    background: var(--s-panel);
+    color: var(--t-ink);
   }
 
   .field:focus {
@@ -581,12 +716,12 @@
     display: inline-flex;
     align-items: center;
     gap: 0.3125rem;
-    height: 1.375rem;
-    padding: 0 0.4375rem;
+    height: 1.5rem;
+    padding: 0 0.5rem;
     border: 1px solid;
     border-radius: 2px;
     font-family: var(--font-sans);
-    font-size: 0.75rem; /* 12 — the one deliberate exception, all-caps */
+    font-size: 0.8125rem; /* 13 — all-caps, so it reads a step below label */
     line-height: 1;
     font-weight: 650;
     letter-spacing: 0.07em;
@@ -613,13 +748,17 @@
   /* ============================ scrollbars ============================ */
   .scroll {
     overflow: auto;
+    /* a scroll inside a panel should not start scrolling the workspace behind
+       it once it bottoms out */
+    overscroll-behavior: contain;
+    scroll-behavior: smooth;
     scrollbar-width: thin;
     scrollbar-color: var(--s-edge) transparent;
   }
 
   .scroll::-webkit-scrollbar {
-    width: 9px;
-    height: 9px;
+    width: 11px;
+    height: 11px;
   }
 
   .scroll::-webkit-scrollbar-thumb {
@@ -848,6 +987,19 @@
   }
 }
 
+/* entering and leaving full canvas: the surface grows into place rather than
+   cutting, so the analyst keeps track of what expanded */
+@keyframes canvas-in {
+  from {
+    opacity: 0;
+    transform: scale(0.988);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @keyframes shimmer {
   from {
     background-position: -180% 0;
@@ -976,6 +1128,10 @@
   animation: blink 1.05s steps(1) infinite;
 }
 
+@utility anim-canvas-in {
+  animation: canvas-in 240ms var(--ease-out-quint) both;
+}
+
 @utility sweep-line {
   position: relative;
   overflow: hidden;
@@ -1014,5 +1170,6 @@
     animation-duration: 1ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
+    scroll-behavior: auto !important;
   }
 }

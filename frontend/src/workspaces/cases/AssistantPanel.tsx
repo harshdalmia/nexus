@@ -71,7 +71,7 @@ export const AssistantPanel = () => {
     : 0.91;
 
   return (
-    <Panel className="hair-l min-h-0 w-full shrink-0 border-0 xl:w-[23rem]">
+    <Panel collapseId="cases.assistant" className="hair-l min-h-0 w-full shrink-0 border-0 xl:w-[24rem] 2xl:w-[28rem]">
       <PanelHead
         title="investigation assistant"
         meta={
@@ -92,10 +92,10 @@ export const AssistantPanel = () => {
       />
 
       <div className="scroll min-h-0 flex-1">
-        <section className="hair-b px-4 py-3.5">
+        <section className="hair-b px-6 py-5">
           <div className="flex items-start justify-between gap-3">
             <div>
-              <p className="eyebrow pb-1">{session ? 'composite risk' : 'risk moved'}</p>
+              <p className="eyebrow pb-2">{session ? 'composite risk' : 'risk moved'}</p>
               <p className="flex items-baseline gap-2">
                 <span
                   className={`metric text-hero leading-none ${
@@ -155,8 +155,8 @@ export const AssistantPanel = () => {
         </section>
 
         {session !== null && session.evidence.length > 0 && (
-          <section className="hair-b px-4 py-3.5">
-            <p className="eyebrow pb-1.5">cited evidence</p>
+          <section className="hair-b px-6 py-5">
+            <p className="eyebrow pb-2.5">cited evidence</p>
             <ul className="flex flex-col gap-1.5">
               {session.evidence.slice(0, 6).map((claim) => (
                 <li key={claim} className="flex items-start gap-2">
@@ -168,7 +168,7 @@ export const AssistantPanel = () => {
           </section>
         )}
 
-        <section className="px-4 py-3.5">
+        <section className="px-6 py-5">
           <div className="flex items-center gap-2 pb-1.5">
             <Tone kind="model">
               <BrainCircuit className="size-2.5" aria-hidden="true" />

@@ -248,7 +248,7 @@ export const AuditWorkspace = () => {
   };
 
   return (
-    <Panel className="border-0">
+    <Panel collapseId="audit.detail" className="border-0">
       <PanelHead
         title="audit trail"
         meta={
@@ -310,27 +310,27 @@ export const AuditWorkspace = () => {
           minWidth="76rem"
           rowSeverity={(row) => statusSeverity[row.status]}
           renderPeek={(row) => (
-            <div className="flex flex-wrap items-start gap-x-10 gap-y-3">
+            <div className="flex flex-wrap items-start gap-x-12 gap-y-6">
               <div className="max-w-[52ch]">
-                <p className="eyebrow pb-1">event</p>
+                <p className="eyebrow pb-2">event</p>
                 <p className="text-body leading-relaxed text-muted">{row.detail}</p>
               </div>
               <div>
-                <p className="eyebrow pb-1">recorded</p>
+                <p className="eyebrow pb-2">recorded</p>
                 <p className="num text-body text-muted">{row.at}</p>
               </div>
               <div>
-                <p className="eyebrow pb-1">user</p>
+                <p className="eyebrow pb-2">user</p>
                 <p className="text-body text-muted">
                   {row.user} · {row.role}
                 </p>
               </div>
               <div>
-                <p className="eyebrow pb-1">workspace</p>
+                <p className="eyebrow pb-2">workspace</p>
                 <p className="text-body text-muted">{row.workspace ?? '—'}</p>
               </div>
               <div className="max-w-[52ch]">
-                <p className="eyebrow pb-1">metadata</p>
+                <p className="eyebrow pb-2">metadata</p>
                 <p className="num text-body text-muted">
                   {metadataText(row) === '' ? 'none recorded' : metadataText(row)}
                 </p>
@@ -353,17 +353,17 @@ export const AuditWorkspace = () => {
           ariaLabel="System audit trail"
           minWidth="66rem"
           renderPeek={(row) => (
-            <div className="flex flex-wrap items-start gap-x-10 gap-y-3">
+            <div className="flex flex-wrap items-start gap-x-12 gap-y-6">
               <div className="max-w-[52ch]">
-                <p className="eyebrow pb-1">event</p>
+                <p className="eyebrow pb-2">event</p>
                 <p className="text-body leading-relaxed text-muted">{row.detail}</p>
               </div>
               <div>
-                <p className="eyebrow pb-1">provenance</p>
+                <p className="eyebrow pb-2">provenance</p>
                 <p className="num text-body text-muted">{row.meta}</p>
               </div>
               <div>
-                <p className="eyebrow pb-1">retention</p>
+                <p className="eyebrow pb-2">retention</p>
                 <p className="text-body text-muted">append-only · hash-chained · 7 years</p>
               </div>
             </div>

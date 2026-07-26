@@ -126,14 +126,14 @@ const ArchitectureMap = () => {
         </span>
       </div>
 
-      <ol className="scroll grid min-h-0 flex-1 auto-rows-min gap-1.5 px-5 py-2.5 lg:grid-cols-2">
+      <ol className="scroll grid min-h-0 flex-1 auto-rows-min gap-3 px-6 py-4 lg:grid-cols-2">
         {agentArchitecture.map((component, index) => {
           const state = stateOf(component.tools);
 
           return (
             <li
               key={component.id}
-              className={`flex min-w-0 flex-col gap-0.5 rounded-[2px] border px-3 py-2 ${
+              className={`flex min-w-0 flex-col gap-0.5 rounded-[2px] border px-4.5 py-3 ${
                 state === 'invoked'
                   ? 'border-ok-line bg-ok-bg/25'
                   : state === 'declined'
@@ -214,7 +214,7 @@ export const ModelsWorkspace = () => {
   return (
     <div className="flex min-h-0 flex-1 flex-col xl:flex-row">
       <div className="hair-r flex min-h-0 flex-1 flex-col">
-        <Panel className="hair-b min-h-0 basis-[45%] border-0">
+        <Panel collapseId="models.architecture" className="hair-b min-h-0 basis-[45%] border-0">
           <PanelHead
             title="agent architecture"
             meta="ten logical components behind the tool roster"
@@ -222,7 +222,7 @@ export const ModelsWorkspace = () => {
           <ArchitectureMap />
         </Panel>
 
-        <Panel className="min-h-0 flex-1 border-0">
+        <Panel collapseId="models.rules" className="min-h-0 flex-1 border-0">
           <PanelHead
             title="rule engine"
             meta={
@@ -239,8 +239,8 @@ export const ModelsWorkspace = () => {
         </Panel>
       </div>
 
-      <div className="flex min-h-0 w-full shrink-0 flex-col xl:w-[25rem]">
-        <Panel className="hair-b shrink-0 border-0">
+      <div className="flex min-h-0 w-full shrink-0 flex-col xl:w-[26rem] 2xl:w-[30rem]">
+        <Panel collapseId="models.performance" className="hair-b shrink-0 border-0">
           <PanelHead
             title="model performance"
             meta={
@@ -255,7 +255,7 @@ export const ModelsWorkspace = () => {
           />
           {perf !== undefined && !perf.available ? (
             /* No metrics rather than invented ones: the harness is an offline job. */
-            <div className="flex flex-col gap-2 px-4 py-3">
+            <div className="flex flex-col gap-2 px-6 py-4.5">
               <p className="max-w-[52ch] text-label leading-relaxed text-muted">{perf.reason}</p>
               <code className="num rounded-[2px] border border-line bg-raise px-2 py-1 text-meta text-ghost">
                 {perf.command}
@@ -289,8 +289,8 @@ export const ModelsWorkspace = () => {
                       ['roc-auc', performance.auc],
                     ] as const)
                 ).map(([label, value]) => (
-                  <div key={String(label)} className="hair-r px-4 py-2.5 last:border-r-0">
-                    <p className="eyebrow pb-0.5">{String(label)}</p>
+                  <div key={String(label)} className="hair-r px-6 py-4 last:border-r-0">
+                    <p className="eyebrow pb-1.5">{String(label)}</p>
                     <p className="metric text-metric leading-none text-ink">
                       {Number(value).toFixed(2)}
                     </p>
@@ -311,7 +311,7 @@ export const ModelsWorkspace = () => {
           )}
         </Panel>
 
-        <Panel className="hair-b min-h-0 flex-1 border-0">
+        <Panel collapseId="models.features" className="hair-b min-h-0 flex-1 border-0">
           <PanelHead
             title="feature importance"
             meta={
@@ -324,7 +324,7 @@ export const ModelsWorkspace = () => {
               </span>
             }
           />
-          <div className="scroll min-h-0 flex-1 px-4 py-2.5">
+          <div className="scroll min-h-0 flex-1 px-6 py-4">
             <MeterList>
               {catalogue === null
                 ? featureImportance.map((feature) => (
@@ -362,7 +362,7 @@ export const ModelsWorkspace = () => {
           </div>
         </Panel>
 
-        <Panel className="shrink-0 border-0">
+        <Panel collapseId="models.weights" className="shrink-0 border-0">
           <PanelHead
             title="score weights"
             meta={
@@ -373,7 +373,7 @@ export const ModelsWorkspace = () => {
               </span>
             }
           />
-          <div className="scroll max-h-[14rem] px-4 py-2.5">
+          <div className="scroll max-h-[14rem] px-6 py-4">
             {weightProfiles.length === 0 ? (
               <MeterList>
                 {scoreWeights.map((weight) => (
@@ -391,7 +391,7 @@ export const ModelsWorkspace = () => {
             ) : (
               weightProfiles.map((profile) => (
                 <section key={profile.typology} className="pb-2 last:pb-0">
-                  <p className="eyebrow pb-1">
+                  <p className="eyebrow pb-2">
                     {profile.typology}
                     {profile.default && ' · default'}
                   </p>
@@ -416,8 +416,8 @@ export const ModelsWorkspace = () => {
         </Panel>
       </div>
 
-      <div className="hair-l flex min-h-0 w-full shrink-0 flex-col xl:w-[22rem]">
-        <Panel className="hair-b min-h-0 flex-1 border-0">
+      <div className="hair-l flex min-h-0 w-full shrink-0 flex-col xl:w-[23rem] 2xl:w-[27rem]">
+        <Panel collapseId="models.volume" className="hair-b min-h-0 flex-1 border-0">
           <PanelHead
             title={series === null ? 'alert volume' : 'transaction volume'}
             meta={
@@ -429,7 +429,7 @@ export const ModelsWorkspace = () => {
           <VizRenderer spec={series === null ? demoAlertSpec : volumeSpec(series)} />
         </Panel>
 
-        <Panel className="hair-b min-h-0 flex-1 border-0">
+        <Panel collapseId="models.explanations" className="hair-b min-h-0 flex-1 border-0">
           <PanelHead
             title={catalogue !== null && catalogue.outcomes.length > 0 ? 'explanations' : 'typology mix'}
             meta={
@@ -451,7 +451,7 @@ export const ModelsWorkspace = () => {
           />
         </Panel>
 
-        <Panel className="shrink-0 border-0">
+        <Panel collapseId="models.funnel" className="shrink-0 border-0">
           <PanelHead
             title="alert funnel"
             meta={

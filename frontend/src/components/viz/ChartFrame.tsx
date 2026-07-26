@@ -51,7 +51,7 @@ export const ChartFrame = ({
   yLabel,
   xLabel,
 }: ChartFrameProps) => (
-  <figure className="flex min-h-0 flex-1 flex-col gap-2 px-3 py-2.5">
+  <figure className="flex min-h-0 flex-1 flex-col gap-2 px-4.5 py-3.5">
     {(subtitle !== undefined || legend !== undefined) && (
       <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
         {subtitle !== undefined && (

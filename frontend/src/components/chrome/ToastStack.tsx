@@ -28,9 +28,9 @@ export const ToastStack = () => {
         return (
           <div
             key={id}
-            className={`anim-fade-up overlay-shadow pointer-events-auto flex items-start gap-2 border bg-panel px-4 py-3 ${className}`}
+            className={`anim-fade-up overlay-shadow pointer-events-auto flex items-start gap-3 border bg-panel px-5 py-4 ${className}`}
           >
-            <Icon className="mt-px size-3.5 shrink-0" aria-hidden="true" />
+            <Icon className="mt-px size-4 shrink-0" aria-hidden="true" />
             <div className="min-w-0 flex-1">
               <p className="text-xs2 font-semibold">{title}</p>
               <p className="text-2xs leading-relaxed text-muted">{detail}</p>

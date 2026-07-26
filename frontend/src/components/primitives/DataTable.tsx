@@ -191,7 +191,7 @@ export const DataTable = <T,>({
           <thead className="thead sticky top-0 z-2">
             <tr>
               {selectable && (
-                <th scope="col" className="dcell w-10 py-2.5 text-left">
+                <th scope="col" className="dcell w-12 py-3.5 text-left">
                   <span className="sr-only">Select</span>
                 </th>
               )}
@@ -205,7 +205,7 @@ export const DataTable = <T,>({
                     scope="col"
                     aria-sort={isSorted ? (sort.direction === 'asc' ? 'ascending' : 'descending') : 'none'}
                     style={{ width: column.width }}
-                    className={`dcell py-2.5 whitespace-nowrap ${
+                    className={`dcell py-3.5 whitespace-nowrap ${
                       column.align === 'right' ? 'text-right' : 'text-left'
                     } ${column.pinned === true ? 'sticky left-0 z-1 bg-sunken' : ''}`}
                   >
@@ -213,16 +213,16 @@ export const DataTable = <T,>({
                       type="button"
                       onClick={() => toggleSort(column)}
                       disabled={!sortable}
-                      className={`eyebrow inline-flex items-center gap-1 ${
+                      className={`eyebrow inline-flex items-center gap-1.5 ${
                         sortable ? 'hover:text-ink' : 'cursor-default'
                       } ${isSorted ? 'text-info' : ''}`}
                     >
                       {column.header}
                       {isSorted &&
                         (sort.direction === 'asc' ? (
-                          <ChevronUp className="size-2.5" aria-hidden="true" />
+                          <ChevronUp className="size-3" aria-hidden="true" />
                         ) : (
-                          <ChevronDown className="size-2.5" aria-hidden="true" />
+                          <ChevronDown className="size-3" aria-hidden="true" />
                         ))}
                     </button>
                   </th>
@@ -293,7 +293,7 @@ export const DataTable = <T,>({
                     <tr className="anim-fade">
                       <td
                         colSpan={columns.length + (selectable ? 1 : 0)}
-                        className="dcell border-b border-line bg-raise py-4"
+                        className="dcell border-b border-line bg-raise py-6"
                       >
                         {renderPeek(row)}
                       </td>
@@ -307,7 +307,7 @@ export const DataTable = <T,>({
       </div>
 
       {(footNote !== undefined || selected.length > 0) && (
-        <div className="flex shrink-0 items-center gap-4 border-t border-line bg-panel px-4 py-3 text-meta text-faint">
+        <div className="flex shrink-0 items-center gap-4 border-t border-line bg-panel px-6 py-4.5 text-meta text-faint">
           {selected.length > 0 ? (
             <>
               <span className="num text-info">{selected.length} selected</span>
