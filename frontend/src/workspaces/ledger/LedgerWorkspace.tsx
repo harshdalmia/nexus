@@ -18,7 +18,8 @@ import { Collapse, Panel, PanelHead } from '@/components/primitives/Panel';
 import { ScoreValue, SeverityTag, Tone } from '@/components/primitives/Severity';
 import { channelLabel, ledgerRows, savedViews } from '@/data/ledger';
 import type { LedgerRow } from '@/data/ledger';
-import { useEngineHealth } from '@/hooks/useEngineHealth';
+import { SourcePending } from '@/components/primitives/DataState';
+import { useDataSource } from '@/store/dataSourceStore';
 import { useCollapsed } from '@/hooks/useCollapsed';
 import { useSessionState } from '@/hooks/useSessionState';
 import { ApiError } from '@/lib/api/client';
@@ -281,7 +282,7 @@ export const LedgerWorkspace = () => {
   const { activeCaseId, scope } = useWorkspaceState();
   const { pin, notify, selectEntity, navigate } = useWorkspaceActions();
   const { record } = useAudit();
-  const { state } = useEngineHealth();
+  const { isLive, isDemo } = useDataSource();
   const { origin } = useAgent();
   const { cases } = useCases();
 
@@ -305,7 +306,12 @@ export const LedgerWorkspace = () => {
   const [currencyOptions, setCurrencyOptions] = useState<readonly string[]>([]);
   const [attribution, setAttribution] = useState<AttributionDto | null>(null);
 
-  const live = state === 'ready';
+  const live = isLive;
+  /* Bundled rows stand in when there is no engine at all, and also when a live
+     engine's ledger endpoint fails — a failed fetch is still a fetch that could
+     not be made. What it must not do is stand in merely because the health probe
+     has not come back yet. */
+  const useDemoRows = isDemo || loadError !== null;
   /* The last investigation this session ran; its evidence is what annotates rows. */
   const runId = origin.runId ?? cases[0]?.runId ?? null;
   const entityScope = scope.find((chip) => chip.kind === 'entity')?.label ?? null;
@@ -472,6 +478,12 @@ export const LedgerWorkspace = () => {
         .map((row) => withAttribution(row, attributed.get(Number(row.id.slice(3)))));
     }
 
+    /* No engine rows yet and no warrant to substitute: an empty result is the
+       honest answer while the source is still being established. */
+    if (!useDemoRows) {
+      return [];
+    }
+
     /* The fixtures carry risk scores, so the demo path can honour every filter,
        including the risk band the engine cannot answer. */
     return ledgerRows
@@ -516,7 +528,7 @@ export const LedgerWorkspace = () => {
       })
       .map(fromFixture)
       .filter(bySearch);
-  }, [liveRows, attributed, filters, entityScope, bounds.min, bounds.max]);
+  }, [liveRows, useDemoRows, attributed, filters, entityScope, bounds.min, bounds.max]);
 
   const inView = rows.reduce((sum, row) => sum + row.amount, 0);
 
@@ -760,9 +772,11 @@ export const LedgerWorkspace = () => {
           title="transaction ledger"
           meta={
             <span className="truncate text-label text-faint">
-              {live
+              {live && !useDemoRows
                 ? `engine · ${num(rows.length)} of ${matching} matching · page ${String(page)}`
-                : `${num(ledgerRows.length)} demo rows · ${num(rows.length)} matching`}
+                : useDemoRows
+                  ? `${num(ledgerRows.length)} demo rows · ${num(rows.length)} matching`
+                  : 'establishing the data source…'}
               {loading && ' · loading…'}
             </span>
           }
@@ -953,10 +967,12 @@ export const LedgerWorkspace = () => {
               active · {chips.length}
             </span>
 
-            {live ? (
+            {useDemoRows ? (
+              <Tone kind="neutral">demo rows</Tone>
+            ) : live ? (
               <Tone kind="info">pushed down to the engine</Tone>
             ) : (
-              <Tone kind="neutral">demo rows</Tone>
+              <Tone kind="neutral">source not established yet</Tone>
             )}
 
             {entityScope !== null && (
@@ -982,7 +998,9 @@ export const LedgerWorkspace = () => {
               </span>
             )}
 
-            <span className="ml-auto flex items-center gap-3">
+            {/* Wraps and keeps its own gaps: as a single nowrap row the saved views
+                ran straight through the reset button on a narrow viewport. */}
+            <span className="flex flex-wrap items-center gap-x-3 gap-y-2 lg:ml-auto">
               <Button size="xs" variant="quiet" disabled={chips.length === 0} onClick={resetFilters}>
                 <RotateCcw className="size-3.5" aria-hidden="true" />
                 reset filters
@@ -1039,7 +1057,9 @@ export const LedgerWorkspace = () => {
           <p className="ml-auto max-w-[46ch] text-label leading-snug text-faint">
             {loadError !== null
               ? `Engine ledger unavailable (${loadError}) — showing bundled demo rows.`
-              : live
+              : !live && !useDemoRows
+                ? 'Waiting to find out whether the engine can answer. Demo rows appear only if it cannot.'
+                : live
                 ? attribution === null
                   ? 'The engine scores accounts, not individual transactions, so rule and risk read “—” on live rows. Run an investigation to see which claims cite a row.'
                   : `The engine scores accounts, not transactions: the ${String(attribution.cited_transactions)} row${attribution.cited_transactions === 1 ? '' : 's'} cited by run ${attribution.run_id.slice(0, 8)} show the citing claim and that account’s score; every other row reads “—”.`
@@ -1053,7 +1073,7 @@ export const LedgerWorkspace = () => {
           columns={columns}
           rowKey={(row) => row.id}
           ariaLabel="Transaction ledger"
-          rowSeverity={live ? undefined : (row) => row.severity ?? 'clear'}
+          rowSeverity={useDemoRows ? (row) => row.severity ?? 'clear' : undefined}
           selectable
           minWidth="78rem"
           onActiveChange={setActiveRow}
@@ -1069,6 +1089,11 @@ export const LedgerWorkspace = () => {
             navigate('graph');
           }}
           emptyState={
+            /* An empty table before the source is settled is not "no matches" — it is
+               "not known yet", and it must not be dressed up as a filter problem. */
+            !live && !useDemoRows ? (
+              <SourcePending label="establishing whether the engine can serve the ledger" />
+            ) : (
             <EmptyState
               icon={<SearchX className="size-4" aria-hidden="true" />}
               title="No transactions match this combination"
@@ -1085,6 +1110,7 @@ export const LedgerWorkspace = () => {
                 },
               ]}
             />
+            )
           }
           renderPeek={(row) => (
             <div className="flex flex-wrap items-start gap-x-12 gap-y-6">

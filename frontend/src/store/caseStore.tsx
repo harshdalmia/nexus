@@ -269,11 +269,23 @@ export const viewOfSession = (record: SessionCase): CaseView => ({
 
 /**
  * The case list the views render: this session's real cases first, and the bundled
- * demo cases only while the session has none, so the workspace is never empty.
+ * demo cases only while the session has none *and* there is no engine to open real
+ * ones against.
+ *
+ * @param allowDemo pass `useDataSource().isDemo`. With a live engine an empty list
+ * is the truth — the analyst has not run anything yet — and filling it with sample
+ * cases would put invented case ids next to real ones.
  */
-export const caseViews = (sessionCases: readonly SessionCase[]): readonly CaseView[] => {
+export const caseViews = (
+  sessionCases: readonly SessionCase[],
+  allowDemo: boolean,
+): readonly CaseView[] => {
   if (sessionCases.length > 0) {
     return sessionCases.map(viewOfSession);
+  }
+
+  if (!allowDemo) {
+    return [];
   }
 
   return demoCases.map((record) => ({

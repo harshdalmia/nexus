@@ -76,15 +76,31 @@ const fromDemo = (rule: (typeof ruleContributions)[number]): Row => ({
 
 export const RuleContributions = ({
   rules,
+  allowDemo,
 }: {
   /** live catalogue; the bundled rules are used when the engine is unreachable */
   readonly rules?: readonly HypothesisRuleDto[];
+  /** true only when there is no engine to fetch the catalogue from */
+  readonly allowDemo: boolean;
 }) => {
   const live = rules !== undefined && rules.length > 0;
   const rows: readonly Row[] = live
     ? rules.map(fromLive)
-    : ruleContributions.map(fromDemo);
+    : allowDemo
+      ? ruleContributions.map(fromDemo)
+      : [];
   const maxCount = Math.max(...rows.map((row) => row.count), 1);
+
+  if (rows.length === 0) {
+    return (
+      <div className="scroll min-h-0 flex-1">
+        <p className="px-5 py-6 text-label leading-relaxed text-faint">
+          Loading the hypothesis library from the engine. The bundled rule set is shown
+          only when there is no engine to read it from.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="scroll min-h-0 flex-1">

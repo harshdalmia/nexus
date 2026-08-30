@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Banknote, BrainCircuit, FileSignature, Landmark, Pin, Siren, StickyNote, Waves } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { SourcePending } from '@/components/primitives/DataState';
 import { Panel, PanelHead } from '@/components/primitives/Panel';
 import { Segmented } from '@/components/primitives/Chip';
 import { caseTimeline } from '@/data/caseFile';
@@ -11,6 +12,7 @@ import { money } from '@/lib/format';
 import { useAudit } from '@/store/auditStore';
 import type { AuditEvent } from '@/store/auditStore';
 import { caseViews, useCases } from '@/store/caseStore';
+import { useDataSource } from '@/store/dataSourceStore';
 import { useWorkspaceActions, useWorkspaceState } from '@/store/workspaceStore';
 import type { Severity, TimelineEvent, TimelineKind } from '@/types/aml';
 
@@ -142,6 +144,7 @@ export const CaseTimeline = () => {
   const { pin, notify } = useWorkspaceActions();
   const { activeCaseId } = useWorkspaceState();
   const { cases } = useCases();
+  const { isDemo } = useDataSource();
   const { events: auditEvents, record } = useAudit();
 
   const [filter, setFilter] = useState<LaneFilter>('all');
@@ -149,8 +152,13 @@ export const CaseTimeline = () => {
   const [timeline, setTimeline] = useState<EntityTimelineDto | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const view = caseViews(cases).find((item) => item.id === activeCaseId);
+  const view = caseViews(cases, isDemo).find((item) => item.id === activeCaseId);
   const subject = view?.session?.entity ?? null;
+
+  /* A real case whose timeline has not arrived yet. The bundled timeline is the
+     fallback for a demo case or a failed fetch — not for a request in flight, so
+     the lanes hold a placeholder until the engine answers. */
+  const pending = subject !== null && timeline === null && error === null;
 
   useEffect(() => {
     if (subject === null) {
@@ -240,7 +248,9 @@ export const CaseTimeline = () => {
                 (timeline.truncated ? ' · truncated' : '')
               : error !== null
                 ? `engine timeline unavailable (${error}) — showing the demo case`
-                : `demo case · day 1 → ${String(days)}`}
+                : pending
+                  ? `resolving ${subject ?? 'the subject'}'s timeline…`
+                  : `demo case · day 1 → ${String(days)}`}
           </span>
         }
         summary={
@@ -262,6 +272,9 @@ export const CaseTimeline = () => {
         }
       />
 
+      {pending ? (
+        <SourcePending label={`loading ${subject ?? 'the subject'}'s timeline from the engine`} />
+      ) : (
       <div className="min-h-0 flex-1 overflow-hidden px-6 py-4.5">
         <div className="relative">
           <div className="flex flex-col gap-[3px]">
@@ -351,6 +364,7 @@ export const CaseTimeline = () => {
           </button>
         </article>
       </div>
+      )}
     </Panel>
   );
 };

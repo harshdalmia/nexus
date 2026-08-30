@@ -5,6 +5,7 @@ import { ApiError, apiBaseUrl } from '@/lib/api/client';
 import { api, scenarioFromRun } from '@/lib/api';
 import { useAudit } from '@/store/auditStore';
 import { useCases } from '@/store/caseStore';
+import { useDataSource } from '@/store/dataSourceStore';
 import type { RunPhase, Scenario, StepState } from '@/types/aml';
 
 /* ------------------------------------------------------------------
@@ -119,6 +120,10 @@ export const AgentProvider = ({ children }: { readonly children: ReactNode }) =>
   const [isDispatching, setDispatching] = useState(false);
   const { record } = useAudit();
   const { upsertFromRun } = useCases();
+  /* Read the app-wide verdict rather than discovering it per query: when the
+     deployment has already declared itself a demo there is no engine to dial,
+     and a 120s timeout per query would be a pointless way to find that out. */
+  const { isDemo, reason: demoReason } = useDataSource();
 
   const speedRef = useRef(speed);
   speedRef.current = speed;
@@ -196,6 +201,27 @@ export const AgentProvider = ({ children }: { readonly children: ReactNode }) =>
         workspace: 'ask',
         metadata: { target: apiLabel() },
       });
+
+      /* Already settled as a demo — a declared demo build, or an engine that has
+         been probed and cannot be reached. Replay the bundled scenario straight
+         away instead of waiting on a request that is known to fail. */
+      if (isDemo) {
+        const demo = findScenario(trimmed);
+        const reason = demoReason ?? 'no engine available — replaying bundled demo data';
+
+        start(demo, trimmed, { source: 'demo', fallbackReason: reason, runId: null });
+
+        record({
+          action: 'investigation.completed',
+          detail: `${demo.resultHeadline} (bundled demo data)`,
+          investigation: demo.caseId ?? null,
+          entity: demo.rows[0]?.entity ?? null,
+          workspace: 'ask',
+          metadata: { source: 'demo', scenario: demo.id, reason },
+        });
+
+        return;
+      }
 
       /* The engine is asked first. It runs the real pipeline, which takes
          seconds, so the console shows a dispatching state until the run
@@ -287,7 +313,7 @@ export const AgentProvider = ({ children }: { readonly children: ReactNode }) =>
         })
         .finally(() => setDispatching(false));
     },
-    [start, record, upsertFromRun],
+    [start, record, upsertFromRun, isDemo, demoReason],
   );
 
   const reset = useCallback(() => {

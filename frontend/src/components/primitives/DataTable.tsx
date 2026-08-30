@@ -315,8 +315,11 @@ export const DataTable = <T,>({
             </>
           ) : (
             <>
-              {footNote}
-              <span className="ml-auto flex items-center gap-1.5">
+              <span className="min-w-0 truncate">{footNote}</span>
+              {/* Keyboard affordances are for keyboard users, so they drop out on
+                  the widths that do not have one — and they never wrap into the
+                  footnote, which is what made both unreadable. */}
+              <span className="ml-auto hidden shrink-0 items-center gap-1.5 lg:flex">
                 <Kbd>j</Kbd>
                 <Kbd>k</Kbd>
                 move

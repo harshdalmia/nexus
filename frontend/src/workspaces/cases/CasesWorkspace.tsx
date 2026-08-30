@@ -1,11 +1,13 @@
 import { useState } from 'react';
-import { Maximize2, Minimize2, Network, Pin } from 'lucide-react';
+import { FolderSearch, Maximize2, Minimize2, Network, Pin } from 'lucide-react';
 import { Button } from '@/components/primitives/Button';
+import { EmptyState } from '@/components/primitives/EmptyState';
 import { Panel, PanelHead } from '@/components/primitives/Panel';
 import { ScoreValue, SeverityTag, Tone } from '@/components/primitives/Severity';
 import { EntityGraph } from '@/components/viz/EntityGraph';
 import { useLiveGraph } from '@/hooks/useLiveGraph';
 import { caseViews, useCases } from '@/store/caseStore';
+import { useDataSource } from '@/store/dataSourceStore';
 import { AssistantPanel } from '@/workspaces/cases/AssistantPanel';
 import { CaseIndex } from '@/workspaces/cases/CaseIndex';
 import { CaseTimeline } from '@/workspaces/cases/CaseTimeline';
@@ -16,14 +18,35 @@ export const CasesWorkspace = () => {
   const { activeCaseId, selectedEntityId } = useWorkspaceState();
   const { selectEntity, pin, notify, navigate } = useWorkspaceActions();
   const { cases: sessionCases } = useCases();
+  const { isDemo } = useDataSource();
   const [expanded, setExpanded] = useState(false);
 
-  const records = caseViews(sessionCases);
+  const records = caseViews(sessionCases, isDemo);
   const record = records.find((item) => item.id === activeCaseId) ?? records[0];
-  const subject = record.session?.entity ?? selectedEntityId;
+  const subject = record?.session?.entity ?? selectedEntityId;
 
   /* The canvas reads the engine's own network for the case subject when there is one. */
-  const { graph } = useLiveGraph(subject, record.live);
+  const { graph } = useLiveGraph(subject, record?.live ?? false);
+
+  /* Against a live engine the case list starts genuinely empty, and the sample case
+     is not shown in its place. Every panel below is a view of one case, so there is
+     nothing to render until an investigation produces one. */
+  if (record === undefined) {
+    return (
+      <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+        <CaseIndex />
+        <div className="flex min-h-0 flex-1 flex-col">
+          <EmptyState
+            icon={<FolderSearch className="size-4" aria-hidden="true" />}
+            title="No case open"
+            body="A case is what an investigation leaves behind: a subject, a score, an escalation and the evidence that produced them. Ask a question and the run becomes the first case here."
+            actions={[{ label: 'Go to Ask', primary: true, onClick: () => navigate('ask') }]}
+            hint="Sample cases appear only when the app is running on demo data."
+          />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">

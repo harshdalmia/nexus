@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Boxes } from 'lucide-react';
+import { SourceMeta, SourcePending } from '@/components/primitives/DataState';
 import { Meter, MeterList } from '@/components/primitives/Meter';
 import { Panel, PanelHead } from '@/components/primitives/Panel';
 import { Tone } from '@/components/primitives/Severity';
@@ -13,6 +14,7 @@ import type { CatalogueSummaryDto, VolumeSeriesDto } from '@/lib/api/types';
 import { num } from '@/lib/format';
 import { useAgent } from '@/store/agentStore';
 import { useCases } from '@/store/caseStore';
+import { useDataSource } from '@/store/dataSourceStore';
 import { RuleContributions } from '@/workspaces/models/RuleContributions';
 import type { ChartSpec, Severity } from '@/types/aml';
 
@@ -183,11 +185,24 @@ const ArchitectureMap = () => {
 
 export const ModelsWorkspace = () => {
   const { cases } = useCases();
+  const { isDemo, isLive } = useDataSource();
   /* A completed investigation changes the measured half of the catalogue. */
-  const { catalogue, error } = useCatalogue(cases.length);
+  const { catalogue, error } = useCatalogue(cases.length, isLive);
   const [series, setSeries] = useState<VolumeSeriesDto | null>(null);
 
+  /* Bundled catalogue figures stand in when there is no engine, or when the
+     catalogue call itself failed. A call still in flight gets neither: the panel
+     says it is loading instead of showing numbers it may be about to replace. */
+  const demoCatalogue = catalogue === null && (isDemo || error !== null);
+  const cataloguePending = catalogue === null && !demoCatalogue;
+
   useEffect(() => {
+    if (!isLive) {
+      setSeries(null);
+
+      return undefined;
+    }
+
     const controller = new AbortController();
 
     /* Daily buckets: the loaded slice is weeks long, so monthly would be one bar. */
@@ -197,7 +212,7 @@ export const ModelsWorkspace = () => {
       .catch(() => setSeries(null));
 
     return () => controller.abort();
-  }, []);
+  }, [isLive]);
 
   const measured = catalogue?.feature_importance.measured ?? [];
   const declared = catalogue?.feature_importance.declared ?? [];
@@ -227,15 +242,20 @@ export const ModelsWorkspace = () => {
             title="rule engine"
             meta={
               <span className="truncate text-label text-faint">
-                {catalogue === null
-                  ? error === null
+                {catalogue !== null
+                  ? `${String(catalogue.rules.length)} hypotheses across ${catalogue.typologies.join(', ')}`
+                  : cataloguePending
                     ? 'loading the detection catalogue…'
-                    : `catalogue unavailable (${error}) — showing bundled rules`
-                  : `${String(catalogue.rules.length)} hypotheses across ${catalogue.typologies.join(', ')}`}
+                    : error !== null
+                      ? `catalogue unavailable (${error}) — showing bundled rules`
+                      : 'bundled rules · demo data'}
               </span>
             }
           />
-          <RuleContributions {...(catalogue === null ? {} : { rules: catalogue.rules })} />
+          <RuleContributions
+            allowDemo={demoCatalogue}
+            {...(catalogue === null ? {} : { rules: catalogue.rules })}
+          />
         </Panel>
       </div>
 
@@ -304,7 +324,11 @@ export const ModelsWorkspace = () => {
                     : 'hybrid · rules + hypothesis duel + novelty'}
                 </Tone>
                 <span className="truncate text-label text-faint">
-                  {catalogue === null ? performance.drift : catalogue.screening.note}
+                  {catalogue !== null
+                    ? catalogue.screening.note
+                    : demoCatalogue
+                      ? performance.drift
+                      : 'screening note not reported yet'}
                 </span>
               </div>
             </>
@@ -318,15 +342,17 @@ export const ModelsWorkspace = () => {
               <span className="truncate text-label text-faint">
                 {measured.length > 0
                   ? `measured across ${String(catalogue?.feature_importance.runs_measured ?? 0)} scored run(s)`
-                  : catalogue === null
-                    ? 'mean |SHAP| across the flagged population'
-                    : (catalogue.feature_importance.reason ?? 'declared weights only')}
+                  : catalogue !== null
+                    ? (catalogue.feature_importance.reason ?? 'declared weights only')
+                    : cataloguePending
+                      ? 'loading…'
+                      : 'mean |SHAP| across the flagged population · demo data'}
               </span>
             }
           />
           <div className="scroll min-h-0 flex-1 px-6 py-4">
             <MeterList>
-              {catalogue === null
+              {demoCatalogue
                 ? featureImportance.map((feature) => (
                     <Meter
                       key={feature.label}
@@ -355,9 +381,11 @@ export const ModelsWorkspace = () => {
             <p className="pt-2 text-label leading-snug text-faint">
               {measured.length > 0
                 ? 'Mean weighted contribution per evidence family, measured from scored runs — not SHAP: the engine ships no supervised model.'
-                : catalogue === null
+                : demoCatalogue
                   ? 'Threshold-avoidance features dominate — the expected shape when structuring is the prevailing typology in this book.'
-                  : 'Declared weights until an investigation has been scored in this process.'}
+                  : cataloguePending
+                    ? 'Waiting for the engine to report its declared weights.'
+                    : 'Declared weights until an investigation has been scored in this process.'}
             </p>
           </div>
         </Panel>
@@ -369,26 +397,14 @@ export const ModelsWorkspace = () => {
               <span className="truncate text-label text-faint">
                 {weightProfiles.length > 0
                   ? `${String(weightProfiles.length)} profiles · config-driven, no retrain`
-                  : 'config-driven, no retrain required'}
+                  : demoCatalogue
+                    ? 'config-driven, no retrain required · demo data'
+                    : 'config-driven, no retrain required'}
               </span>
             }
           />
           <div className="scroll max-h-[14rem] px-6 py-4">
-            {weightProfiles.length === 0 ? (
-              <MeterList>
-                {scoreWeights.map((weight) => (
-                  <Meter
-                    key={weight.label}
-                    label={weight.label}
-                    note={weight.note}
-                    value={weight.weight.toFixed(2)}
-                    ratio={weight.weight * 100}
-                    tone="info"
-                    labelWidth="9rem"
-                  />
-                ))}
-              </MeterList>
-            ) : (
+            {weightProfiles.length > 0 ? (
               weightProfiles.map((profile) => (
                 <section key={profile.typology} className="pb-2 last:pb-0">
                   <p className="eyebrow pb-2">
@@ -411,6 +427,22 @@ export const ModelsWorkspace = () => {
                   </MeterList>
                 </section>
               ))
+            ) : cataloguePending ? (
+              <SourcePending label="loading the score weights from the engine" />
+            ) : (
+              <MeterList>
+                {scoreWeights.map((weight) => (
+                  <Meter
+                    key={weight.label}
+                    label={weight.label}
+                    note={weight.note}
+                    value={weight.weight.toFixed(2)}
+                    ratio={weight.weight * 100}
+                    tone="info"
+                    labelWidth="9rem"
+                  />
+                ))}
+              </MeterList>
             )}
           </div>
         </Panel>
@@ -420,13 +452,15 @@ export const ModelsWorkspace = () => {
         <Panel collapseId="models.volume" className="hair-b min-h-0 flex-1 border-0">
           <PanelHead
             title={series === null ? 'alert volume' : 'transaction volume'}
-            meta={
-              <span className="truncate text-label text-faint">
-                {series === null ? '12 weeks · demo data' : 'from the loaded dataset'}
-              </span>
-            }
+            meta={<SourceMeta live="from the loaded dataset" demo="12 weeks" />}
           />
-          <VizRenderer spec={series === null ? demoAlertSpec : volumeSpec(series)} />
+          {isDemo ? (
+            <VizRenderer spec={demoAlertSpec} />
+          ) : series === null ? (
+            <SourcePending label="loading the transaction volume from the engine" />
+          ) : (
+            <VizRenderer spec={volumeSpec(series)} />
+          )}
         </Panel>
 
         <Panel collapseId="models.explanations" className="hair-b min-h-0 flex-1 border-0">
@@ -436,19 +470,26 @@ export const ModelsWorkspace = () => {
               <span className="truncate text-label text-faint">
                 {catalogue !== null && catalogue.outcomes.length > 0
                   ? 'which hypothesis won, this session'
-                  : catalogue === null
-                    ? 'quarter to date'
-                    : 'run a query to populate outcomes'}
+                  : demoCatalogue
+                    ? 'quarter to date · demo data'
+                    : cataloguePending
+                      ? 'loading…'
+                      : 'run a query to populate outcomes'}
               </span>
             }
           />
-          <VizRenderer
-            spec={
-              catalogue !== null && catalogue.outcomes.length > 0
-                ? outcomeSpec(catalogue)
-                : demoMixSpec
-            }
-          />
+          {catalogue !== null && catalogue.outcomes.length > 0 ? (
+            <VizRenderer spec={outcomeSpec(catalogue)} />
+          ) : demoCatalogue ? (
+            <VizRenderer spec={demoMixSpec} />
+          ) : cataloguePending ? (
+            <SourcePending label="loading the detection catalogue from the engine" />
+          ) : (
+            <p className="px-6 py-8 text-center text-label leading-relaxed text-faint">
+              No investigation has been scored in this process yet, so there are no
+              outcomes to chart. Run a query in Ask.
+            </p>
+          )}
         </Panel>
 
         <Panel collapseId="models.funnel" className="shrink-0 border-0">
@@ -458,15 +499,27 @@ export const ModelsWorkspace = () => {
               <span className="truncate text-label text-faint">
                 {catalogue?.funnel.available === true
                   ? `from run “${catalogue.funnel.query ?? ''}”`
-                  : (catalogue?.funnel.reason ?? 'screened → flagged → reviewable → reportable')}
+                  : demoCatalogue
+                    ? 'screened → flagged → reviewable → reportable · demo data'
+                    : cataloguePending
+                      ? 'loading…'
+                      : (catalogue?.funnel.reason ??
+                        'screened → flagged → reviewable → reportable')}
               </span>
             }
           />
-          <Pyramid
-            steps={
-              catalogue?.funnel.available === true ? funnelSteps(catalogue) : pyramid
-            }
-          />
+          {catalogue?.funnel.available === true ? (
+            <Pyramid steps={funnelSteps(catalogue)} />
+          ) : demoCatalogue ? (
+            <Pyramid steps={pyramid} />
+          ) : cataloguePending ? (
+            <SourcePending label="loading the alert funnel from the engine" />
+          ) : (
+            <p className="px-6 py-8 text-center text-label leading-relaxed text-faint">
+              {catalogue?.funnel.reason ??
+                'The funnel is measured from a scored run. Ask a question to produce one.'}
+            </p>
+          )}
         </Panel>
       </div>
     </div>

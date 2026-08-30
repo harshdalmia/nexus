@@ -23,12 +23,22 @@ export interface EngineHealth {
   readonly error: string | null;
 }
 
-export const useEngineHealth = (): EngineHealth => {
+/**
+ * @param enabled Set false to skip probing entirely — used when the app is
+ * running in explicit demo mode, where there is no engine to ask and a poll
+ * would only produce a console full of failed requests. The state then stays
+ * `unknown`, and the caller is expected to have already decided on demo data.
+ */
+export const useEngineHealth = (enabled = true): EngineHealth => {
   const [health, setHealth] = useState<HealthDto | null>(null);
   const [state, setState] = useState<EngineState>('unknown');
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!enabled) {
+      return undefined;
+    }
+
     const controller = new AbortController();
     let timer: number | undefined;
     let cancelled = false;
@@ -71,7 +81,7 @@ export const useEngineHealth = (): EngineHealth => {
         window.clearTimeout(timer);
       }
     };
-  }, []);
+  }, [enabled]);
 
   return { state, health, error };
 };

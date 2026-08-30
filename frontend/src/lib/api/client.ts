@@ -13,10 +13,21 @@
 const DEFAULT_BASE = 'http://127.0.0.1:8000';
 const DEFAULT_TIMEOUT_MS = 120_000;
 
-/** Configured at build time with VITE_API_BASE_URL; falls back to the local engine. */
-export const apiBaseUrl: string = (
-  (import.meta.env.VITE_API_BASE_URL as string | undefined) ?? DEFAULT_BASE
-).replace(/\/$/, '');
+const configuredBase = (import.meta.env.VITE_API_BASE_URL as string | undefined)?.trim();
+
+/**
+ * Configured at build time with VITE_API_BASE_URL; falls back to the local engine.
+ *
+ * A blank value is a deliberate "no engine configured" signal (see `lib/demoMode`),
+ * but it still has to resolve to something parseable: `buildUrl` uses `new URL`, and
+ * an empty base would throw a raw TypeError outside the ApiError contract every
+ * caller catches. So it resolves to the default here and the demo switch — not a
+ * broken request — is what actually keeps the app off the network.
+ */
+export const apiBaseUrl: string =
+  configuredBase === undefined || configuredBase.length === 0
+    ? DEFAULT_BASE
+    : configuredBase.replace(/\/$/, '');
 
 export const apiPrefix = '/api/v1';
 

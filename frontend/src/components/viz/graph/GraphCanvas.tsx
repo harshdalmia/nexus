@@ -234,10 +234,14 @@ const GraphCanvas = ({
               showInteractive={false}
               style={{ marginBottom: 10, marginLeft: 10 }}
             />
+            {/* An overview of the graph is only worth its footprint when there is
+                graph left around it; on a phone-sized canvas it covers the nodes
+                it is meant to help you find. */}
             <MiniMap
               position="bottom-right"
               pannable
               zoomable
+              className="hidden lg:block"
               maskColor="color-mix(in oklab, var(--s-abyss) 60%, transparent)"
               style={{ width: 148, height: 96, marginBottom: 10, marginRight: 10 }}
               nodeColor={(node) => minimapColor[(node as EntityFlowNode).data.entity.severity]}

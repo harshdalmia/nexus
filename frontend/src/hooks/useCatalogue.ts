@@ -19,14 +19,25 @@ export interface CatalogueResult {
   readonly error: string | null;
 }
 
-export const useCatalogue = (runsCompleted: number): CatalogueResult => {
+/**
+ * @param runsCompleted refetch trigger: a new investigation changes the outcome
+ * counts, the funnel and the measured contributions.
+ * @param enabled false when the app has no engine to ask (explicit demo mode, or a
+ * probe that came back offline), so the request is not made at all.
+ */
+export const useCatalogue = (runsCompleted: number, enabled = true): CatalogueResult => {
   const [catalogue, setCatalogue] = useState<CatalogueSummaryDto | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  /* `runsCompleted` is a refetch trigger: a new investigation changes the outcome
-     counts, the funnel and the measured contributions. */
   useEffect(() => {
+    if (!enabled) {
+      setCatalogue(null);
+      setLoading(false);
+
+      return undefined;
+    }
+
     const controller = new AbortController();
     let cancelled = false;
     setLoading(true);
@@ -55,7 +66,7 @@ export const useCatalogue = (runsCompleted: number): CatalogueResult => {
       cancelled = true;
       controller.abort();
     };
-  }, [runsCompleted]);
+  }, [runsCompleted, enabled]);
 
   return { catalogue, loading, error };
 };

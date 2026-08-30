@@ -1,13 +1,14 @@
 import { useEffect, useState } from 'react';
 import { ArrowUpRight, BrainCircuit, Clock, TrendingUp } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
+import { SourceMeta, SourcePending } from '@/components/primitives/DataState';
 import { Meter, MeterList } from '@/components/primitives/Meter';
 import { Panel, PanelHead } from '@/components/primitives/Panel';
 import { VizRenderer } from '@/components/viz/VizRenderer';
 import { alertTrend } from '@/data/models';
 import { analystActivity, signals } from '@/data/queue';
 import type { SignalCard } from '@/data/queue';
-import { useEngineHealth } from '@/hooks/useEngineHealth';
+import { useDataSource } from '@/store/dataSourceStore';
 import { api } from '@/lib/api';
 import type { VolumeSeriesDto } from '@/lib/api/types';
 import { num } from '@/lib/format';
@@ -76,10 +77,8 @@ export const SignalStack = () => {
   const { spine } = useWorkspaceState();
   const { cases } = useCases();
   const { events } = useAudit();
-  const { state } = useEngineHealth();
+  const { isLive: live, isDemo } = useDataSource();
   const [series, setSeries] = useState<VolumeSeriesDto | null>(null);
-
-  const live = state === 'ready';
 
   useEffect(() => {
     if (!live) {
@@ -144,7 +143,17 @@ export const SignalStack = () => {
       <Panel collapseId="watchtower.signal" className="hair-b min-h-0 flex-1 border-0">
         <PanelHead title="signal" meta="what changed, and what to do about it" />
         <div className="scroll min-h-0 flex-1">
-          {signals.map((signal) => {
+          {/* Standing conditions are bundled illustrations, so they are held to the
+              same rule as every other demo figure: shown only when there is no
+              engine to compute them. */}
+          {!isDemo && (
+            <p className="px-6 py-5 text-label leading-relaxed text-faint">
+              The engine exposes no standing-conditions endpoint, so there is nothing to
+              compute here yet. Illustrative signals are shown only when the app is
+              running on demo data.
+            </p>
+          )}
+          {isDemo && signals.map((signal) => {
             const Icon = kindIcon[signal.kind];
 
             return (
@@ -168,23 +177,27 @@ export const SignalStack = () => {
               </article>
             );
           })}
-          <p className="px-6 py-4 text-meta leading-relaxed text-faint">
-            Standing conditions need a persistent backend to compute; these three are
-            illustrative until one exists.
-          </p>
+          {isDemo && (
+            <p className="px-6 py-4 text-meta leading-relaxed text-faint">
+              Standing conditions need a persistent backend to compute; these three are
+              illustrative until one exists.
+            </p>
+          )}
         </div>
       </Panel>
 
       <Panel collapseId="watchtower.model" className="hair-b shrink-0 border-0">
         <PanelHead
           title={series === null ? 'alert trend' : 'volume trend'}
-          meta={
-            <span className="truncate text-label text-faint">
-              {series === null ? '12 weeks · demo data' : 'from the loaded dataset'}
-            </span>
-          }
+          meta={<SourceMeta live="from the loaded dataset" demo="12 weeks" />}
         />
-        <VizRenderer spec={series === null ? demoTrend : liveTrend(series)} />
+        {isDemo ? (
+          <VizRenderer spec={demoTrend} />
+        ) : series === null ? (
+          <SourcePending label="loading the volume trend from the engine" />
+        ) : (
+          <VizRenderer spec={liveTrend(series)} />
+        )}
       </Panel>
 
       <Panel collapseId="watchtower.sla" className="hair-b shrink-0 border-0">
@@ -222,15 +235,24 @@ export const SignalStack = () => {
           }
         />
         <ul className="flex flex-col px-6 py-4">
-          {activity.length === 0
-            ? analystActivity.slice(0, 4).map((entry) => (
+          {activity.length === 0 ? (
+            /* An empty session trail is a fact, not a gap to paper over: the sample
+               entries stand in only when the app is running on demo data. */
+            isDemo ? (
+              analystActivity.slice(0, 4).map((entry) => (
                 <li key={entry.time} className="flex items-baseline gap-2 py-[3px]">
                   <span className="num shrink-0 text-meta text-faint">{entry.time}</span>
                   <span className="shrink-0 text-meta text-muted">{entry.who}</span>
                   <span className="text-label leading-relaxed text-muted">{entry.text}</span>
                 </li>
               ))
-            : activity.map((event) => (
+            ) : (
+              <li className="py-[3px] text-label leading-relaxed text-faint">
+                Nothing recorded yet. Actions you take this session appear here.
+              </li>
+            )
+          ) : (
+            activity.map((event) => (
                 <li key={event.id} className="flex items-baseline gap-2 py-[3px]">
                   <span className="num shrink-0 text-meta text-faint">{clockOf(event.at)}</span>
                   <span className="shrink-0 text-meta text-info">
@@ -240,7 +262,8 @@ export const SignalStack = () => {
                     {event.detail}
                   </span>
                 </li>
-              ))}
+            ))
+          )}
         </ul>
       </Panel>
     </div>
