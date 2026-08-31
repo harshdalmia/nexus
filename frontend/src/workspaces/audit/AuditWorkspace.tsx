@@ -1,14 +1,16 @@
 import { useMemo, useState } from 'react';
-import { Download, Eraser } from 'lucide-react';
+import { Download, Eraser, ScrollText } from 'lucide-react';
 import { Button } from '@/components/primitives/Button';
 import { Segmented } from '@/components/primitives/Chip';
 import { DataTable } from '@/components/primitives/DataTable';
 import type { Column } from '@/components/primitives/DataTable';
+import { EmptyState } from '@/components/primitives/EmptyState';
 import { Panel, PanelHead } from '@/components/primitives/Panel';
 import { SeverityTag, Tone } from '@/components/primitives/Severity';
 import { auditLog } from '@/data/caseFile';
 import { auditActionLabel, useAudit } from '@/store/auditStore';
 import type { AuditEvent, AuditStatus } from '@/store/auditStore';
+import { useDataSource } from '@/store/dataSourceStore';
 import { useWorkspaceActions } from '@/store/workspaceStore';
 import type { Severity } from '@/types/aml';
 
@@ -76,6 +78,7 @@ type SystemEntry = (typeof auditLog)[number];
 export const AuditWorkspace = () => {
   const { notify } = useWorkspaceActions();
   const { events, record, clear } = useAudit();
+  const { isDemo } = useDataSource();
   const [source, setSource] = useState<Source>('session');
   const [filter, setFilter] = useState<ActorFilter>('all');
 
@@ -96,9 +99,11 @@ export const AuditWorkspace = () => {
     [events, filter],
   );
 
+  /* The institutional log is a seeded illustration — the engine keeps no such
+     store — so it is held to the same rule as every other bundled figure. */
   const systemRows = useMemo(
     () =>
-      auditLog.filter((entry) => {
+      (isDemo ? auditLog : []).filter((entry) => {
         if (filter === 'agent') {
           return entry.actor === 'agent' || entry.actor === 'system';
         }
@@ -109,7 +114,7 @@ export const AuditWorkspace = () => {
 
         return true;
       }),
-    [filter],
+    [filter, isDemo],
   );
 
   const sessionColumns: ReadonlyArray<Column<AuditEvent>> = [
@@ -255,7 +260,9 @@ export const AuditWorkspace = () => {
           <span className="truncate text-label text-faint">
             {source === 'session'
               ? `this browser session · ${String(events.length)} events · held in session storage, cleared when the session ends`
-              : 'seeded institutional log · every query, tool run, disposition and export'}
+              : isDemo
+                ? 'seeded institutional log · demo data · every query, tool run, disposition and export'
+                : 'no institutional log — the engine keeps none'}
           </span>
         }
         actions={
@@ -352,6 +359,16 @@ export const AuditWorkspace = () => {
           rowKey={(row) => row.id}
           ariaLabel="System audit trail"
           minWidth="66rem"
+          emptyState={
+            <EmptyState
+              icon={<ScrollText className="size-4" aria-hidden="true" />}
+              title="No institutional log"
+              body="The engine records per-run audit receipts, not a standing append-only register, so there is nothing to list here. The seeded example is shown only when the app is running on demo data."
+              actions={[
+                { label: 'Show this session', primary: true, onClick: () => setSource('session') },
+              ]}
+            />
+          }
           renderPeek={(row) => (
             <div className="flex flex-wrap items-start gap-x-12 gap-y-6">
               <div className="max-w-[52ch]">

@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
+import { SourceMeta, SourcePending } from '@/components/primitives/DataState';
 import { Panel, PanelHead } from '@/components/primitives/Panel';
 import { Heatmap } from '@/components/viz/Heatmap';
 import { VizRenderer } from '@/components/viz/VizRenderer';
 import { patternMix } from '@/data/models';
 import { exposureHeat, heatWeeks } from '@/data/queue';
-import { useEngineHealth } from '@/hooks/useEngineHealth';
+import { useDataSource } from '@/store/dataSourceStore';
 import { api } from '@/lib/api';
 import type { CorridorHeatDto, DistributionsDto } from '@/lib/api/types';
 import { AlertQueue } from '@/workspaces/watchtower/AlertQueue';
@@ -43,11 +44,9 @@ const bandSpec = (distributions: DistributionsDto): ChartSpec => ({
 
 export const WatchtowerWorkspace = () => {
   const { addScope, navigate, notify } = useWorkspaceActions();
-  const { state } = useEngineHealth();
+  const { isLive: live, isDemo } = useDataSource();
   const [heat, setHeat] = useState<CorridorHeatDto | null>(null);
   const [distributions, setDistributions] = useState<DistributionsDto | null>(null);
-
-  const live = state === 'ready';
 
   useEffect(() => {
     if (!live) {
@@ -77,10 +76,15 @@ export const WatchtowerWorkspace = () => {
     return () => controller.abort();
   }, [live]);
 
-  const heatRows = heat === null ? exposureHeat : heat.rows;
+  /* Bundled figures are used only when the source is settled as demo. While the
+     engine's state is unresolved — or it is live but the fetch is still out —
+     the grid holds a placeholder rather than borrowing the demo set. */
+  const heatRows = isDemo ? exposureHeat : (heat?.rows ?? []);
   /* Column headers are month-day; the full ISO date does not fit the grid. */
-  const heatColumns = heat === null ? heatWeeks : heat.columns.map((column) => column.slice(5));
+  const heatColumns = isDemo ? heatWeeks : (heat?.columns.map((column) => column.slice(5)) ?? []);
   const rowLabel = heat?.row_label ?? 'jurisdiction';
+  const heatReady = isDemo || heat !== null;
+  const mixReady = isDemo || distributions !== null;
 
   return (
     <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
@@ -91,24 +95,27 @@ export const WatchtowerWorkspace = () => {
             <PanelHead
               title="corridor exposure"
               meta={
-                <span className="truncate text-label text-faint">
-                  {heat === null
-                    ? 'jurisdiction × week · demo data'
-                    : `${rowLabel} × day · value share of the busiest cell`}
-                </span>
+                <SourceMeta
+                  live={`${rowLabel} × day · value share of the busiest cell`}
+                  demo="jurisdiction × week"
+                />
               }
             />
             <div className="scroll min-h-0 flex-1">
-              <Heatmap
-                rows={heatRows}
-                columns={heatColumns}
-                rowLabel={rowLabel}
-                onCellSelect={(row, column) => {
-                  addScope({ id: 'sc-juris-sel', kind: 'jurisdiction', label: `${row} · ${column}` });
-                  navigate('ledger');
-                  notify('Scope applied', `Ledger filtered to ${row} in ${column}.`, 'info');
-                }}
-              />
+              {heatReady ? (
+                <Heatmap
+                  rows={heatRows}
+                  columns={heatColumns}
+                  rowLabel={rowLabel}
+                  onCellSelect={(row, column) => {
+                    addScope({ id: 'sc-juris-sel', kind: 'jurisdiction', label: `${row} · ${column}` });
+                    navigate('ledger');
+                    notify('Scope applied', `Ledger filtered to ${row} in ${column}.`, 'info');
+                  }}
+                />
+              ) : (
+                <SourcePending label="loading corridor exposure from the engine" />
+              )}
             </div>
             {heat !== null && (
               <p className="hair-t px-4 py-2 text-meta leading-snug text-faint">{heat.note}</p>
@@ -119,14 +126,17 @@ export const WatchtowerWorkspace = () => {
             <PanelHead
               title={distributions === null ? 'typology mix' : 'amount bands'}
               meta={
-                <span className="truncate text-label text-faint">
-                  {distributions === null
-                    ? 'what the open queue is made of'
-                    : 'where the dataset’s value actually sits'}
-                </span>
+                <SourceMeta
+                  live="where the dataset’s value actually sits"
+                  demo="what the open queue is made of"
+                />
               }
             />
-            <VizRenderer spec={distributions === null ? demoMix : bandSpec(distributions)} />
+            {mixReady ? (
+              <VizRenderer spec={distributions === null ? demoMix : bandSpec(distributions)} />
+            ) : (
+              <SourcePending label="loading amount bands from the engine" />
+            )}
           </Panel>
         </div>
       </div>

@@ -7,6 +7,7 @@ import { DonutConfidence } from '@/components/viz/Charts';
 import { riskDeltas } from '@/data/caseFile';
 import { signed } from '@/lib/format';
 import { caseViews, useCases } from '@/store/caseStore';
+import { useDataSource } from '@/store/dataSourceStore';
 import { useWorkspaceActions, useWorkspaceState } from '@/store/workspaceStore';
 
 /* ------------------------------------------------------------------
@@ -31,11 +32,14 @@ export const AssistantPanel = () => {
   const { activeCaseId, inspectorCollapsed } = useWorkspaceState();
   const { pin, notify, requestQuery, toggleInspector } = useWorkspaceActions();
   const { cases } = useCases();
+  const { isDemo } = useDataSource();
   const [followUp, setFollowUp] = useState('');
 
-  const records = caseViews(cases);
+  /* CasesWorkspace does not mount this panel without a case, so `record` is
+     present in practice; the optional access keeps it honest if that changes. */
+  const records = caseViews(cases, isDemo);
   const record = records.find((item) => item.id === activeCaseId) ?? records[0];
-  const session = record.session;
+  const session = record?.session;
 
   if (inspectorCollapsed) {
     return (

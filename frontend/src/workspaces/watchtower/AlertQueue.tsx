@@ -10,6 +10,7 @@ import { Segmented } from '@/components/primitives/Chip';
 import { useAudit } from '@/store/auditStore';
 import { caseViews, useCases } from '@/store/caseStore';
 import type { CaseStage, CaseView } from '@/store/caseStore';
+import { useDataSource } from '@/store/dataSourceStore';
 import { useWorkspaceActions } from '@/store/workspaceStore';
 
 /* ------------------------------------------------------------------
@@ -38,9 +39,10 @@ export const AlertQueue = () => {
   const { openCase, notify, pin } = useWorkspaceActions();
   const { record } = useAudit();
   const { cases } = useCases();
+  const { isDemo } = useDataSource();
 
   const live = cases.length > 0;
-  const views = useMemo(() => caseViews(cases), [cases]);
+  const views = useMemo(() => caseViews(cases, isDemo), [cases, isDemo]);
 
   const rows = useMemo(() => {
     const filtered = views.filter((view) => {
@@ -125,7 +127,9 @@ export const AlertQueue = () => {
           <span className="truncate text-label text-faint">
             {live
               ? `${String(rows.length)} case(s) opened this session · ordered by engine risk`
-              : `${String(rows.length)} demo cases · run a query in Ask to fill the queue`}
+              : isDemo
+                ? `${String(rows.length)} demo cases · run a query in Ask to fill the queue`
+                : 'nothing opened yet · run a query in Ask to fill the queue'}
           </span>
         }
         /* folded, the header still carries the count that matters */

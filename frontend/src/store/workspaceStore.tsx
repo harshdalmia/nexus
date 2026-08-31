@@ -24,6 +24,13 @@ interface WorkspaceState {
   readonly density: Density;
   readonly theme: Theme;
   readonly railCollapsed: boolean;
+  /**
+   * The nav drawer on narrow viewports, where the rail is off-canvas rather
+   * than in flow. Separate from `railCollapsed`, which is the desktop
+   * wide/narrow preference — the two must not overwrite each other when the
+   * window crosses the breakpoint.
+   */
+  readonly navOpen: boolean;
   readonly inspectorCollapsed: boolean;
   readonly paletteOpen: boolean;
   readonly shortcutsOpen: boolean;
@@ -44,6 +51,7 @@ type Action =
   | { type: 'ui/density' }
   | { type: 'ui/theme' }
   | { type: 'ui/rail' }
+  | { type: 'ui/nav'; open: boolean }
   | { type: 'ui/inspector' }
   | { type: 'ui/palette'; open: boolean }
   | { type: 'ui/shortcuts'; open: boolean }
@@ -63,6 +71,7 @@ const initialState: WorkspaceState = {
   density: 'compact',
   theme: 'dark',
   railCollapsed: false,
+  navOpen: false,
   inspectorCollapsed: false,
   paletteOpen: false,
   shortcutsOpen: false,
@@ -72,8 +81,10 @@ const initialState: WorkspaceState = {
 
 const reducer = (state: WorkspaceState, action: Action): WorkspaceState => {
   switch (action.type) {
+    /* Navigating always dismisses the drawer: on a narrow screen it covers the
+       thing the analyst just asked to see. */
     case 'navigate':
-      return { ...state, workspace: action.workspace, paletteOpen: false };
+      return { ...state, workspace: action.workspace, paletteOpen: false, navOpen: false };
     case 'scope/add': {
       const withoutKind = state.scope.filter(
         (chip) => chip.kind !== action.chip.kind || chip.locked === true,
@@ -86,7 +97,13 @@ const reducer = (state: WorkspaceState, action: Action): WorkspaceState => {
     case 'scope/reset':
       return { ...state, scope: initialState.scope };
     case 'case/open':
-      return { ...state, activeCaseId: action.caseId, workspace: 'cases', paletteOpen: false };
+      return {
+        ...state,
+        activeCaseId: action.caseId,
+        workspace: 'cases',
+        paletteOpen: false,
+        navOpen: false,
+      };
     case 'entity/select':
       return { ...state, selectedEntityId: action.entityId };
     case 'spine/pin':
@@ -115,6 +132,8 @@ const reducer = (state: WorkspaceState, action: Action): WorkspaceState => {
       return { ...state, theme: state.theme === 'dark' ? 'light' : 'dark' };
     case 'ui/rail':
       return { ...state, railCollapsed: !state.railCollapsed };
+    case 'ui/nav':
+      return { ...state, navOpen: action.open };
     case 'ui/inspector':
       return { ...state, inspectorCollapsed: !state.inspectorCollapsed };
     case 'ui/palette':
@@ -131,6 +150,7 @@ const reducer = (state: WorkspaceState, action: Action): WorkspaceState => {
         pendingQuery: action.query,
         workspace: action.query === null ? state.workspace : 'ask',
         paletteOpen: false,
+        navOpen: false,
       };
     default:
       return state;
@@ -245,6 +265,7 @@ export const useWorkspaceActions = () => {
       toggleDensity: () => dispatch({ type: 'ui/density' }),
       toggleTheme: () => dispatch({ type: 'ui/theme' }),
       toggleRail: () => dispatch({ type: 'ui/rail' }),
+      setNav: (open: boolean) => dispatch({ type: 'ui/nav', open }),
       toggleInspector: () => dispatch({ type: 'ui/inspector' }),
       setPalette: (open: boolean) => dispatch({ type: 'ui/palette', open }),
       setShortcuts: (open: boolean) => dispatch({ type: 'ui/shortcuts', open }),

@@ -1085,6 +1085,44 @@
   }
 }
 
+@keyframes breathe {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* A stacked panel arriving as the workspace scrolls into it. Shorter and
+   flatter than `fade-up`, because it fires on many siblings at once and a
+   larger movement would read as the layout settling rather than content
+   appearing. */
+@keyframes stack-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The nav drawer's contents, staggered behind the panel itself so the list
+   reads as arriving rather than being already there. */
+@keyframes drawer-item {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @utility anim-fade-up {
   animation: fade-up 260ms var(--ease-out-quint) both;
 }
@@ -1132,6 +1170,16 @@
   animation: canvas-in 240ms var(--ease-out-quint) both;
 }
 
+@utility anim-stack-in {
+  animation: stack-in 300ms var(--ease-out-quint) both;
+}
+
+/* Skeleton rows and placeholder plates pulse rather than shimmer: a shimmer
+   sweep on a full-height panel reads as a progress bar that never advances. */
+@utility anim-breathe {
+  animation: breathe 2.2s var(--ease-in-out-quart) infinite;
+}
+
 @utility sweep-line {
   position: relative;
   overflow: hidden;
@@ -1161,6 +1209,101 @@
     transparent
   );
   animation: sweep 1.5s var(--ease-in-out-quart) infinite;
+}
+
+/* ============================================================================
+   responsive shell
+   ----------------------------------------------------------------------------
+   At `lg` and up this is a fixed-viewport instrument: the workspace fills the
+   screen exactly, and each panel scrolls inside its own frame so the chrome
+   never moves. That model needs enough height to divide between panels.
+
+   Below `lg` there isn't. Nested `flex-1` columns each resolve from a
+   flex-basis of 0, and `min-h-0` — correct on a desktop panel, where it is
+   what lets a scroll container shrink — removes flexbox's automatic minimum
+   size. With no free height to distribute, every panel rounds to a few pixels,
+   and because `.panel` sets `overflow: hidden` its content spills and paints
+   over the panel beside it. That is the overlap, not a z-index problem.
+
+   So below `lg` the model changes instead of being squeezed: panels take their
+   content height and the workspace itself is what scrolls.
+   ============================================================================ */
+/* The height clause matters as much as the width one. A 1024×768 laptop is
+   "desktop" by width, but three stacked panel rows plus 20px of chrome do not
+   fit in 768px either, and the failure is identical. Below ~820px of viewport
+   height the workspace scrolls regardless of how wide it is. */
+@media (max-width: 1023px), (max-height: 820px) {
+  #workspace {
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior-y: contain;
+  }
+
+  /* Only children of *column* containers. Row containers must keep shrinking,
+     because that is what makes `truncate` work on a narrow screen. `.flex-col`
+     is a literal class here: `lg:flex-row` lives in a min-width query, so
+     below the breakpoint these really are columns. */
+  #workspace > *,
+  #workspace .flex-col > * {
+    flex-shrink: 0;
+  }
+
+  /* Restoring the automatic minimum is the actual fix: a panel can no longer be
+     compressed below its content. */
+  #workspace > .min-h-0,
+  #workspace .flex-col > .min-h-0 {
+    min-height: auto;
+  }
+
+  /* A canvas has no intrinsic height to fall back on, so it needs a floor or it
+     collapses to nothing once it is no longer filling a fixed viewport. */
+  #workspace .react-flow,
+  #workspace [data-canvas] {
+    min-height: 22rem;
+  }
+
+  /* Exception to the rule above, and it has to come after it to win on order:
+     inside a panel that is deliberately height-capped for the stacked layout
+     (the case list, the score-weight list), the body must stay shrinkable. Given
+     an automatic minimum it would grow past the cap, and the panel's
+     `overflow: hidden` would clip it instead of letting it scroll. */
+  #workspace [class*='max-h-'] .min-h-0 {
+    min-height: 0;
+  }
+}
+
+/* Nav drawer contents arrive just behind the panel itself, so opening reads as a
+   surface sliding in rather than a block of links cutting into place. Scoped to
+   the drawer: the desktop rail is always present, and animating it on every
+   render would be motion for its own sake. */
+@media (max-width: 1023px) {
+  nav[data-nav-open='true'] .nav-group {
+    animation: drawer-item 260ms var(--ease-out-quint) both;
+  }
+
+  nav[data-nav-open='true'] .nav-group:nth-of-type(2) {
+    animation-delay: 45ms;
+  }
+
+  nav[data-nav-open='true'] .nav-group:nth-of-type(3) {
+    animation-delay: 90ms;
+  }
+
+  nav[data-nav-open='true'] .nav-group:nth-of-type(4) {
+    animation-delay: 135ms;
+  }
+}
+
+/* Touch and small screens: hit targets grow, and the chrome gives back the
+   horizontal padding it spends on a large display. */
+@media (max-width: 767px) {
+  [data-density='compact'],
+  [data-density='relaxed'] {
+    --cell-x: 0.875rem;
+    --panel-x: 1rem;
+    --sec-x: 1rem;
+    --control-h: 40px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

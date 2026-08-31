@@ -38,7 +38,13 @@ export const QueryConsole = () => {
 
   return (
     <section className="hair-b relative bg-panel">
-      <form onSubmit={submit} className="flex items-center gap-3.5 px-6 py-6" autoComplete="off">
+      {/* Wraps rather than overflowing: the submit button is the primary action of
+          the whole workspace, so it must never be the thing pushed off-screen. */}
+      <form
+        onSubmit={submit}
+        className="flex flex-wrap items-center gap-x-3.5 gap-y-3 px-4 py-5 sm:px-6 sm:py-6"
+        autoComplete="off"
+      >
         <label htmlFor="agent-query" className="sr-only">
           Natural language query
         </label>
@@ -55,15 +61,15 @@ export const QueryConsole = () => {
           value={value}
           onChange={(event) => setValue(event.target.value)}
           placeholder="Ask in plain language — “find structuring patterns in the last 30 days”"
-          className="flex-1 bg-transparent text-lede text-ink placeholder:text-faint focus:outline-none"
+          className="w-full min-w-0 flex-1 basis-40 bg-transparent text-lede text-ink placeholder:text-faint focus:outline-none"
         />
-        <span className="hidden items-center gap-1 text-meta text-faint sm:flex">
+        <span className="hidden items-center gap-1 text-meta text-faint lg:flex">
           <Kbd>/</Kbd> focus
         </span>
         <button
           type="submit"
           disabled={value.trim().length === 0 || isBusy}
-          className="ctl ctl-primary shrink-0 gap-1.5 px-2.5 text-xs2 font-semibold"
+          className="ctl ctl-primary ml-auto shrink-0 gap-1.5 px-2.5 text-xs2 font-semibold"
         >
           <Sparkles className="size-3" aria-hidden="true" />
           {isBusy ? 'investigating…' : 'investigate'}
@@ -72,7 +78,7 @@ export const QueryConsole = () => {
       </form>
 
       {phase === 'idle' && (
-        <div className="flex flex-wrap items-center gap-2.5 px-6 pb-5">
+        <div className="flex flex-wrap items-center gap-2.5 px-4 pb-5 sm:px-6">
           <span className="eyebrow shrink-0">try</span>
           {scenarios.map((scenario) => (
             <button
@@ -82,7 +88,10 @@ export const QueryConsole = () => {
                 setValue(scenario.query);
                 run(scenario.query);
               }}
-              className="ctl h-8 px-3 text-label"
+              /* `.ctl` is nowrap by default, which is right for a toolbar button and
+                 wrong for a full sentence: one long suggestion would otherwise be
+                 wider than a phone and drag the whole console with it. */
+              className="ctl h-auto max-w-full min-h-8 px-3 py-1.5 text-left text-label whitespace-normal"
             >
               {scenario.query}
               <span className="num pl-1.5 text-meta text-faint">

@@ -8,6 +8,7 @@ import { useHotkeys } from '@/hooks/useHotkeys';
 import { AgentProvider } from '@/store/agentStore';
 import { AuditProvider } from '@/store/auditStore';
 import { CaseProvider } from '@/store/caseStore';
+import { DataSourceProvider } from '@/store/dataSourceStore';
 import { WorkspaceProvider, useWorkspaceActions, useWorkspaceState } from '@/store/workspaceStore';
 import { AskWorkspace } from '@/workspaces/ask/AskWorkspace';
 import { AuditWorkspace } from '@/workspaces/audit/AuditWorkspace';
@@ -103,7 +104,10 @@ const Shell = () => {
   });
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-canvas">
+    /* `dvh` rather than `vh`: on mobile browsers `100vh` is the viewport with the
+       URL bar retracted, so a `vh`-sized shell puts the status strip under the
+       browser chrome until you scroll. */
+    <div className="flex h-[100dvh] w-full overflow-hidden bg-canvas">
       <a
         href="#workspace"
         className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-60 focus:border focus:border-info-line focus:bg-panel focus:px-2 focus:py-1 focus:text-xs2 focus:text-info"
@@ -115,7 +119,14 @@ const Shell = () => {
 
       <div className="flex min-w-0 flex-1 flex-col">
         <CommandBar />
-        <main id="workspace" className="flex min-h-0 flex-1 flex-col" aria-label={workspace}>
+        {/* `key` restarts the entrance animation on every workspace change, so a
+            switch reads as a new surface arriving rather than a repaint. */}
+        <main
+          id="workspace"
+          key={workspace}
+          className="anim-fade-up flex min-h-0 flex-1 flex-col"
+          aria-label={workspace}
+        >
           <Workspace />
         </main>
         <StatusStrip />
@@ -130,14 +141,18 @@ const Shell = () => {
 
 export const App = () => (
   <WorkspaceProvider>
-    {/* Audit and cases sit above the agent so a completed run can record itself
-        into both as it happens. */}
-    <AuditProvider>
-      <CaseProvider>
-        <AgentProvider>
-          <Shell />
-        </AgentProvider>
-      </CaseProvider>
-    </AuditProvider>
+    {/* Outermost of the data providers: every panel and the agent itself ask it
+        whether to render engine numbers, bundled ones, or neither yet. */}
+    <DataSourceProvider>
+      {/* Audit and cases sit above the agent so a completed run can record itself
+          into both as it happens. */}
+      <AuditProvider>
+        <CaseProvider>
+          <AgentProvider>
+            <Shell />
+          </AgentProvider>
+        </CaseProvider>
+      </AuditProvider>
+    </DataSourceProvider>
   </WorkspaceProvider>
 );

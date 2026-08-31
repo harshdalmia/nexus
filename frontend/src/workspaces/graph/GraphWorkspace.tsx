@@ -5,10 +5,11 @@ import { Segmented } from '@/components/primitives/Chip';
 import { Panel, PanelHead } from '@/components/primitives/Panel';
 import { ScoreValue, SeverityTag, Tone } from '@/components/primitives/Severity';
 import { EntityGraph } from '@/components/viz/EntityGraph';
+import { DemoBadge } from '@/components/primitives/DataState';
 import { edgeKindLabel, entityKindLabel, graphEdges, graphNodes } from '@/data/graph';
-import { useEngineHealth } from '@/hooks/useEngineHealth';
 import { useLiveGraph } from '@/hooks/useLiveGraph';
 import { useAudit } from '@/store/auditStore';
+import { useDataSource } from '@/store/dataSourceStore';
 import { useWorkspaceActions, useWorkspaceState } from '@/store/workspaceStore';
 
 type ViewMode = 'graph' | 'table';
@@ -20,7 +21,7 @@ export const GraphWorkspace = () => {
   const { selectedEntityId, activeCaseId } = useWorkspaceState();
   const { selectEntity, addScope, pin, notify, navigate } = useWorkspaceActions();
   const { record } = useAudit();
-  const { state } = useEngineHealth();
+  const { isLive } = useDataSource();
   const [expanded, setExpanded] = useState(true);
   const [mode, setMode] = useState<ViewMode>('graph');
   const [focusNeighbours, setFocusNeighbours] = useState(true);
@@ -29,11 +30,15 @@ export const GraphWorkspace = () => {
      the connection list and the adjacency table all read the engine's own ego
      network. Otherwise every one of them reads the bundled network — they are
      never mixed, so a row and a node always describe the same graph. */
-  const { graph, loading, error } = useLiveGraph(selectedEntityId, state === 'ready');
+  const { graph, loading, error } = useLiveGraph(selectedEntityId, isLive);
 
+  /* The bundled network is the fallback only when there is no engine to ask.
+     With a live engine and a demo-shaped id ("4521" rather than "bank|account")
+     there is genuinely nothing to resolve, so the demo topology still stands in —
+     but the badge below says which one is on screen either way. */
+  const liveGraph = graph !== null;
   const nodes = graph?.nodes ?? graphNodes;
   const edges = graph?.edges ?? graphEdges;
-  const isLive = graph !== null;
 
   const node = nodes.find((item) => item.id === selectedEntityId) ?? nodes[Math.min(6, nodes.length - 1)];
 
@@ -70,13 +75,14 @@ export const GraphWorkspace = () => {
             <span className="flex items-center gap-2">
               <span className="num text-ink">{node.id}</span>
               <span className="truncate">{node.role}</span>
-              <Tone kind={isLive ? 'info' : 'neutral'}>
-                {isLive
+              <Tone kind={liveGraph ? 'info' : 'neutral'}>
+                {liveGraph
                   ? `engine · ${String(nodes.length)} entities · ${String(edges.length)} relationships`
                   : expanded
                     ? '10 entities · 2 hops'
                     : '7 entities · 1 hop'}
               </Tone>
+              {!liveGraph && <DemoBadge />}
               {loading && <span className="text-meta text-faint">resolving…</span>}
               {error !== null && <span className="text-meta text-rev">{error}</span>}
             </span>
@@ -115,7 +121,7 @@ export const GraphWorkspace = () => {
                 entity: id,
                 workspace: 'graph',
                 metadata: {
-                  source: isLive ? 'engine' : 'demo',
+                  source: liveGraph ? 'engine' : 'demo',
                   hops: expanded ? '2' : '1',
                   nodes: String(nodes.length),
                 },
